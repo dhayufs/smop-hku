@@ -42,7 +42,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </div>
             </div>
         </div>
-
+        
         <div class="col-span-12 lg:col-span-3">
             <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
                 <div class="card-header border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-800">
@@ -63,9 +63,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
-
-        <div class="col-span-12 lg:col-span-6">
+        </div>        
+        
+        <div class="col-span-12 lg:col-span-9">
             <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
                 <div class="card-header border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-800">
                     <h5 class="mb-0 font-medium"><i data-feather="activity" class="w-4 h-4 mr-2 inline-block"></i> Live Checklist Monitoring</h5>
@@ -116,14 +116,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                     <?php endif; ?>
                                                     
                                                     <?php if ($item->tipe_item == 'checklist'): ?>
-                                                        <button type="button" class="btn btn-xs bg-secondary-500 text-white hover:bg-secondary-600" 
-                                                                data-toggle="modal" 
-                                                                data-target="#historyModal" 
-                                                                data-item-id="<?php echo $item->id; ?>"
-                                                                data-deskripsi="<?php echo $item->deskripsi; ?>"
+                                                        <a href="<?php echo site_url('admin/item_history/' . $item->id); ?>" class="btn btn-xs bg-secondary-500 text-white hover:bg-secondary-600" 
                                                                 title="Lihat Riwayat Aksi">
                                                             <i data-feather="clock" class="w-4 h-4"></i> Riwayat
-                                                        </button>
+                                                        </a>
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
@@ -151,61 +147,4 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     if (typeof feather !== 'undefined') {
         feather.replace();
     }
-    
-    // --- JS/AJAX untuk Memuat Riwayat Aksi ---
-    $('#historyModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var itemId = button.data('item-id');
-        var deskripsi = button.data('deskripsi');
-        var modal = $(this);
-
-        modal.find('#item_desc_title').text(deskripsi);
-        modal.find('#history_list').html('<li class="list-group-item text-center text-muted">Memuat riwayat...</li>');
-
-        // Panggil Controller untuk mengambil data log via AJAX
-        $.ajax({
-            url: '<?php echo site_url('admin/get_item_history_ajax'); ?>/' + itemId,
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                var list = $('#history_list');
-                list.empty();
-                
-                if (response.length > 0) {
-                    // Helper untuk format tanggal (Kita asumsikan format_indo_date sudah tersedia di header, 
-                    // atau kita gunakan format JS sederhana)
-                    
-                    response.forEach(function(history) {
-                        // Perbaikan: Konversi timestamp ke Date object untuk formatting
-                        // Asumsi: history.timestamp adalah string tanggal yang bisa diterima new Date()
-                        var logDate = new Date(history.timestamp);
-                        var formattedTime = logDate.toLocaleString('id-ID', { 
-                            weekday: 'long', 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric', 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        });
-                        
-                        var itemHtml = `
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="ms-2 me-auto">
-                                    <div class="font-weight-bold">${history.perubahan}</div>
-                                    <small class="text-muted">oleh: ${history.user_pengubah_nama}</small>
-                                </div>
-                                <span class="badge bg-primary-500 text-white">${formattedTime}</span>
-                            </li>
-                        `;
-                        list.append(itemHtml);
-                    });
-                } else {
-                    list.append('<li class="list-group-item text-center text-info">Belum ada riwayat perubahan status.</li>');
-                }
-            },
-            error: function() {
-                modal.find('#history_list').html('<li class="list-group-item text-center text-danger">Gagal memuat data riwayat.</li>');
-            }
-        });
-    });
 </script>
