@@ -2,7 +2,6 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // === FUNGSI HELPER BARU UNTUK FORMAT WAKTU KSA/WIB ===
-// Didefinisikan di sini untuk memastikan ketersediaan, mengandalkan helper format_indo_date yang seharusnya sudah dimuat
 if (!function_exists('format_log_time')) {
     function format_log_time($timestamp) {
         // Asumsi: Waktu di DB adalah WIB (Asia/Jakarta)
@@ -71,7 +70,7 @@ if (!function_exists('format_log_time')) {
                                     $status_log = $matches[1];
                                     $perubahan_log = $log->perubahan;
                                     
-                                    // Mencari Foto Bukti Path (Perhatikan path di DB: ./assets/...)
+                                    // Mencari Foto Bukti Path
                                     preg_match("/Foto Bukti: (.+\.(?:jpg|jpeg|png|gif))/", $log->perubahan, $foto_match);
                                     $log_foto_path = $foto_match[1] ?? null;
 
@@ -81,7 +80,7 @@ if (!function_exists('format_log_time')) {
 
                                     $log_time = format_log_time($log->timestamp);
                                     
-                                    // 1. Highlight Status dengan warna dan bold
+                                    // 1. Highlight Status
                                     foreach ($status_log as $status) {
                                         $color_class = str_replace('text-', 'font-bold text-', $status_colors[$status] ?? 'text-muted');
                                         $highlighted_status = "<span class='{$color_class}'>'{$status}'</span>";
@@ -90,12 +89,10 @@ if (!function_exists('format_log_time')) {
                                     
                                     $status_baru_badge = end($status_log);
                                     $badge_color_class = str_replace('text-', 'bg-', $status_colors[$status_baru_badge]) ?? 'bg-secondary-500';
-                                    $badge_class = str_replace('-500', '', $badge_color_class); // e.g., bg-success
+                                    $badge_class = str_replace('-500', '', $badge_color_class);
                                     
-                                    // 2. Hapus teks "User [Nama] " dan path Foto Bukti dari deskripsi perubahan
+                                    // 2. Hapus teks yang sudah di-parsing dari deskripsi perubahan
                                     $perubahan_text_clean = str_replace('User ' . $log->user_pengubah_nama . ' ', '', $perubahan_log);
-                                    
-                                    // Hapus juga Catatan dan Foto Bukti dari text clean
                                     $perubahan_text_clean = preg_replace("/Catatan: (.*?)(\sFoto Bukti:|$)/", '', $perubahan_text_clean);
                                     if ($log_foto_path) {
                                          $perubahan_text_clean = preg_replace("/Foto Bukti: (.*?)(\s|$)/", '', $perubahan_text_clean);
@@ -124,19 +121,30 @@ if (!function_exists('format_log_time')) {
                                         </small>
                                     </div>
                                     
-                                    <p class="mb-0 text-gray-700 dark:text-gray-300">
+                                    <div class="text-gray-700 dark:text-gray-300"> 
+                                        
                                         <?php if ($log_catatan && trim($log_catatan) != "NULL"): ?>
-                                            <span class="font-bold text-dark dark:text-white">Catatan:</span> <?php echo $log_catatan; ?><br>
+                                            <p class="mb-1">
+                                                <span class="font-bold text-dark dark:text-white">Catatan:</span> 
+                                                <span><?php echo $log_catatan; ?></span>
+                                            </p>
                                         <?php endif; ?>
                                         
-                                        <span class="text-xs text-gray-600 dark:text-gray-400"><?php echo nl2br($perubahan_text_clean); ?></span>
-
-                                        <?php if ($normalized_path): ?>
-                                            <a href="<?php echo base_url($normalized_path); ?>" target="_blank" class="btn btn-sm bg-primary-500 text-white py-1 px-2 mt-1 float-right hover:bg-primary-600">
-                                                <i data-feather="image" class="w-3 h-3"></i> Bukti
-                                            </a>
-                                        <?php endif; ?>
-                                    </p> 
+                                        <div class="flex justify-between items-end gap-2 mt-2">
+                                            
+                                            <p class="mb-0 text-xs text-gray-600 dark:text-gray-400 break-words flex-grow">
+                                                <?php echo nl2br($perubahan_text_clean); ?>
+                                            </p>
+                                            
+                                            <?php if ($normalized_path): ?>
+                                                <div class="flex-shrink-0">
+                                                    <a href="<?php echo base_url($normalized_path); ?>" target="_blank" class="btn btn-sm bg-primary-500 text-white py-1 px-2 hover:bg-primary-600">
+                                                        <i data-feather="image" class="w-3 h-3 mr-1"></i> Bukti
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div> 
+                                        </div> 
                                 </li>
                             <?php endforeach; ?>
                         </ul>
