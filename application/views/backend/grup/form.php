@@ -87,7 +87,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                     <option value="">-- Pilih User (Opsional) --</option>
                                                     <?php if (isset($users)): ?>
                                                         <?php foreach ($users as $u): ?>
-                                                            <?php if ($u->system_role == 'tim_lapangan'): ?>
+                                                            <?php if ($u->system_role == 'user'): ?>
                                                                 <option value="<?php echo $u->id; ?>" <?php echo set_select('user_peran_' . $p->id, $u->id); ?>>
                                                                     <?php echo $u->nama_lengkap; ?> (<?php echo $u->username; ?>)
                                                                 </option>
