@@ -75,10 +75,10 @@ $tanggal_target = $tanggal_target ?? NULL;
                         
                         <div class="table-responsive">
                             <table class="table table-sm table-striped w-full mb-0">
-                                <thead class="bg-primary-dark text-white">
+                                <thead class="bg-white text-black border-b border-gray-400">
                                     <tr>
-                                        <th class="py-2 px-3 text-center" style="width: 5%">#</th>
-                                        <th class="py-2 px-3">Deskripsi Tugas</th>
+                                        <th class="py-2 px-3 text-center" style="width: 5%">Item</th>
+                                        <th class="py-2 px-3">Tugas</th>
                                         <th class="py-2 px-3 text-center" style="width: 15%">PIC</th>
                                         <th class="py-2 px-3 text-center" style="width: 10%">Status</th>
                                         <th class="py-2 px-3 text-center" style="width: 15%">Aksi / Bukti</th>
