@@ -1,149 +1,165 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+
+// === FUNGSI HELPER BARU UNTUK FORMAT WAKTU KSA/WIB ===
+// Didefinisikan di sini untuk memastikan ketersediaan, mengandalkan helper format_indo_date yang seharusnya sudah dimuat
+if (!function_exists('format_log_time')) {
+    function format_log_time($timestamp) {
+        // Asumsi: Waktu di DB adalah WIB (Asia/Jakarta)
+        $dt_wib = new DateTime($timestamp, new DateTimeZone('Asia/Jakarta'));
+        
+        // Konversi ke KSA (Saudi Arabia Standard Time)
+        $dt_ksa = clone $dt_wib;
+        $dt_ksa->setTimezone(new DateTimeZone('Asia/Riyadh'));
+        
+        // Output format yang diminta
+        $tanggal_indo = function_exists('format_indo_date') ? format_indo_date($dt_wib->format('Y-m-d')) : $dt_wib->format('d M Y');
+        $wib_time = $dt_wib->format('H:i');
+        $ksa_time = $dt_ksa->format('H:i');
+        
+        return [
+            'tanggal' => $tanggal_indo,
+            'wib' => $wib_time,
+            'ksa' => $ksa_time
+        ];
+    }
+}
+// ========================================================
 ?>
 
 <div class="col-span-12">
-    
-    <?php if ($this->session->flashdata('success')): ?>
-        <div class="alert alert-success bg-green-100 text-green-800 p-3 rounded mb-4"><i data-feather="check-circle" class="w-4 h-4 mr-2 inline-block"></i> <?php echo $this->session->flashdata('success'); ?></div>
-    <?php endif; ?>
-    <?php if ($this->session->flashdata('error')): ?>
-        <div class="alert alert-danger bg-red-100 text-red-800 p-3 rounded mb-4"><i data-feather="alert-triangle" class="w-4 h-4 mr-2 inline-block"></i> <?php echo $this->session->flashdata('error'); ?></div>
-    <?php endif; ?>
-    
-    <div class="grid grid-cols-12 gap-x-6">
-        
-        <div class="col-span-12 lg:col-span-3">
-            <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
-                <div class="card-header border-b border-gray-200 dark:border-gray-700 p-4 bg-primary-500 text-white">
-                    <h6 class="mb-0 font-medium"><i data-feather="info" class="w-4 h-4 mr-2 inline-block"></i> Ringkasan Grup</h6>
-                </div>
-                <div class="card-body p-4">
-                    <p class="text-sm mb-1"><strong>Nama Grup:</strong> <?php echo $grup->nama_grup; ?></p>
-                    <p class="text-sm mb-1"><strong>Template Asal:</strong> ID <?php echo $grup->template_asal_id; ?></p>
-                    <p class="text-sm mb-1"><strong>Keberangkatan:</strong> <?php echo date('d M Y', strtotime($grup->tanggal_keberangkatan)); ?></p>
-                    <p class="text-sm mb-3"><strong>Kepulangan:</strong> <?php echo date('d M Y', strtotime($grup->tanggal_pulang)); ?></p>
-                    
-                    <p class="text-sm mb-3"><strong>Status Grup:</strong> 
-                        <span class="badge bg-success-500 text-white"><?php echo $grup->status_grup; ?></span>
-                    </p>
-                    
-                    <hr class="my-4 border-t border-gray-200 dark:border-gray-700">
-                    
-                    <h6 class="font-semibold text-sm mb-3 text-warning-500">Aksi Admin</h6>
-                    <div class="flex flex-col space-y-2">
-                        <a href="<?php echo site_url('admin/grup_form/' . $grup->id); ?>" class="btn bg-warning-500 text-white hover:bg-warning-600 btn-sm">
-                            <i data-feather="repeat" class="w-4 h-4 mr-1 inline-block"></i> Geser Jadwal
-                        </a>
-                        <a href="<?php echo site_url('admin/delete_grup/' . $grup->id); ?>" class="btn bg-danger-500 text-white hover:bg-danger-600 btn-sm" onclick="return confirm('Yakin hapus grup ini? SEMUA DATA CHECKLIST AKAN HILANG!');">
-                            <i data-feather="trash-2" class="w-4 h-4 mr-1 inline-block"></i> Hapus Grup
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
+        <div class="card-header border-b border-theme-border dark:border-themedark-border p-4 bg-gray-50 dark:bg-gray-800 flex justify-between items-center">
+            <h5 class="mb-0 font-medium">
+                <i data-feather="clock" class="w-4 h-4 mr-2 inline-block"></i> Riwayat Aksi: <?php echo $item->deskripsi; ?>
+            </h5>
+            <a href="<?php echo site_url('admin/grup_detail/' . $grup->id); ?>" class="btn bg-secondary-500 text-white hover:bg-secondary-600 btn-sm">
+                <i data-feather="arrow-left" class="w-4 h-4 mr-2 inline-block"></i> Kembali ke Monitoring Grup
+            </a>
         </div>
         
-        <div class="col-span-12 lg:col-span-3">
-            <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
-                <div class="card-header border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-800">
-                    <h6 class="mb-0 font-medium text-sm"><i data-feather="user-check" class="w-4 h-4 mr-2 inline-block"></i> Tim Lapangan Ditugaskan</h6>
+        <div class="card-body p-6"> 
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <p class="text-sm mb-1"><strong>Grup:</strong> <?php echo $grup->nama_grup; ?></p>
+                    <p class="text-sm mb-1"><strong>Tanggal Item:</strong> <?php echo function_exists('format_indo_date') ? format_indo_date($item->tanggal_item) : $item->tanggal_item; ?></p>
+                    <p class="text-sm mb-3"><strong>PIC Saat Ini:</strong> <span class="text-warning-500 font-weight-bold"><?php echo $item->pj_nama ? $item->pj_nama : 'Belum Ditugaskan'; ?></span></p>
+                    <hr>
                 </div>
-                <div class="card-body p-4">
-                    <?php if (!empty($penugasan)): ?>
+            </div>
+            
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary-500 text-white p-3">
+                    <h6 class="mb-0">Log Perubahan Tugas</h6>
+                </div>
+                <div class="card-body p-0">
+                    <?php if (!empty($riwayat)): ?>
                         <ul class="list-group list-group-flush">
-                            <?php foreach ($penugasan as $p): ?>
-                                <li class="list-group-item d-flex justify-content-between items-center text-sm px-0 py-2 border-b">
-                                    <strong class="text-primary-500"><?php echo $p->nama_peran; ?>:</strong>
-                                    <span><?php echo $p->nama_lengkap; ?></span>
+                            <?php 
+                                $status_colors = [
+                                    'Pending' => 'text-secondary-500', 
+                                    'Sukses' => 'text-success-500', 
+                                    'Cukup' => 'text-info-500', 
+                                    'Buruk' => 'text-warning-500', 
+                                    'Gagal' => 'text-danger-500'
+                                ];
+                            ?>
+                            <?php foreach ($riwayat as $log): ?>
+                                <?php 
+                                    // LOGIC FOR PARSING: Replicated from mytasks/update_task_form.php
+                                    preg_match_all("/'([^']+)'/", $log->perubahan, $matches);
+                                    $status_log = $matches[1];
+                                    $perubahan_log = $log->perubahan;
+                                    
+                                    // Mencari Foto Bukti Path (Perhatikan path di DB: ./assets/...)
+                                    preg_match("/Foto Bukti: (.+\.(?:jpg|jpeg|png|gif))/", $log->perubahan, $foto_match);
+                                    $log_foto_path = $foto_match[1] ?? null;
+
+                                    // Mencari Catatan
+                                    preg_match("/Catatan: (.*?)(\sFoto Bukti:|$)/", $log->perubahan, $catatan_match);
+                                    $log_catatan = $catatan_match[1] ?? null;
+
+                                    $log_time = format_log_time($log->timestamp);
+                                    
+                                    // 1. Highlight Status dengan warna dan bold
+                                    foreach ($status_log as $status) {
+                                        $color_class = str_replace('text-', 'font-bold text-', $status_colors[$status] ?? 'text-muted');
+                                        $highlighted_status = "<span class='{$color_class}'>'{$status}'</span>";
+                                        $perubahan_log = str_replace("'$status'", $highlighted_status, $perubahan_log);
+                                    }
+                                    
+                                    $status_baru_badge = end($status_log);
+                                    $badge_color_class = str_replace('text-', 'bg-', $status_colors[$status_baru_badge]) ?? 'bg-secondary-500';
+                                    $badge_class = str_replace('-500', '', $badge_color_class); // e.g., bg-success
+                                    
+                                    // 2. Hapus teks "User [Nama] " dan path Foto Bukti dari deskripsi perubahan
+                                    $perubahan_text_clean = str_replace('User ' . $log->user_pengubah_nama . ' ', '', $perubahan_log);
+                                    
+                                    // Hapus juga Catatan dan Foto Bukti dari text clean
+                                    $perubahan_text_clean = preg_replace("/Catatan: (.*?)(\sFoto Bukti:|$)/", '', $perubahan_text_clean);
+                                    if ($log_foto_path) {
+                                         $perubahan_text_clean = preg_replace("/Foto Bukti: (.*?)(\s|$)/", '', $perubahan_text_clean);
+                                    }
+                                    
+                                    // --- NORMALISASI PATH GAMBAR UNTUK LINK ---
+                                    $normalized_path = '';
+                                    if ($log_foto_path) {
+                                        $file_name_only = basename($log_foto_path); 
+                                        $normalized_path = 'assets/uploads/bukti/' . $file_name_only; 
+                                    }
+
+                                ?>
+                                <li class="list-group-item text-sm p-3 border-b border-gray-200 dark:border-gray-700">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <span class="d-inline-block font-medium">
+                                            <?php echo $log->user_pengubah_nama; ?> 
+                                            <small class="text-muted">(<?php echo $log_time['tanggal']; ?>)</small>
+                                            <span class="badge <?php echo $badge_class; ?> text-white ml-1">
+                                                <?php echo $status_baru_badge; ?>
+                                            </span>
+                                        </span>
+                                        
+                                        <small class="font-weight-bold text-gray-500 dark:text-gray-400">
+                                            <?php echo $log_time['wib']; ?> WIB | <?php echo $log_time['ksa']; ?> KSA
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="text-gray-700 dark:text-gray-300"> 
+                                        
+                                        <?php if ($log_catatan && trim($log_catatan) != "NULL"): ?>
+                                            <p class="mb-1">
+                                                <span class="font-bold text-dark dark:text-white">Catatan:</span> 
+                                                <span><?php echo $log_catatan; ?></span>
+                                            </p>
+                                        <?php endif; ?>
+                                        
+                                        <p class="mb-0 text-xs text-gray-600 dark:text-gray-400">
+                                            <?php echo nl2br($perubahan_text_clean); ?>
+                                        </p>
+                                        
+                                        <?php if ($normalized_path): ?>
+                                            <div class="flex justify-end mt-2">
+                                                <a href="<?php echo base_url($normalized_path); ?>" target="_blank" class="btn btn-sm bg-primary-500 text-white py-1 px-2 hover:bg-primary-600">
+                                                    <i data-feather="image" class="w-3 h-3 mr-1"></i> Bukti
+                                                </a>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div> 
                                 </li>
                             <?php endforeach; ?>
                         </ul>
                     <?php else: ?>
-                        <p class="text-muted text-sm">Tidak ada tim yang ditugaskan ke grup ini.</p>
+                        <div class="p-3 text-center text-muted">Belum ada riwayat perubahan untuk tugas ini.</div>
                     <?php endif; ?>
                 </div>
             </div>
-        </div>        
-        
-        <div class="col-span-12 lg:col-span-9">
-            <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
-                <div class="card-header border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-800">
-                    <h5 class="mb-0 font-medium"><i data-feather="activity" class="w-4 h-4 mr-2 inline-block"></i> Live Checklist Monitoring</h5>
-                    <small class="text-muted">Status eksekusi real-time dari Tim Lapangan.</small>
-                </div>
-                <div class="card-body p-4">
-                    <?php if (empty($grouped_items)): ?>
-                        <div class="alert alert-warning text-center bg-yellow-100 text-yellow-800 p-4 rounded">
-                            Checklist live belum dicetak. Pastikan template memiliki item.
-                        </div>
-                    <?php else: ?>
-                        <?php foreach ($grouped_items as $tgl => $items_per_day): ?>
-                            <div class="card border-primary mb-4 shadow-sm">
-                                <div class="card-header bg-primary-500 text-white p-3">
-                                    🗓️ <?php echo date('d M Y', strtotime($tgl)); ?>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <?php foreach ($items_per_day as $item): ?>
-                                        <?php
-                                            $status_class = [
-                                                'Pending' => 'secondary-500',
-                                                'Sukses' => 'success-500',
-                                                'Cukup' => 'info-500',
-                                                'Buruk' => 'warning-500',
-                                                'Gagal' => 'danger-500'
-                                            ];
-                                            $status_text_color = $item->status == 'Pending' ? 'text-muted' : 'font-bold';
-                                        ?>
-                                        <li class="list-group-item text-sm px-3 py-2 border-b">
-                                            <div class="flex flex-wrap items-center justify-between">
-                                                <div class="flex items-center flex-grow min-w-0 mb-1 sm:mb-0">
-                                                    <span class="badge bg-<?php echo $status_class[$item->status]; ?> text-white mr-2 flex-shrink-0"><?php echo $item->status; ?></span>
-                                                    
-                                                    <?php if ($item->tipe_item == 'checklist'): ?>
-                                                        <small class="text-xs text-info-500 mr-2 flex-shrink-0">[PJ: <?php echo $item->pj_nama ? $item->pj_nama : 'Belum Ditugaskan'; ?>]</small>
-                                                    <?php else: ?>
-                                                        <small class="text-xs text-muted mr-2 flex-shrink-0">(! Info)</small>
-                                                    <?php endif; ?>
-                                                    
-                                                    <span class="<?php echo $status_text_color; ?> truncate w-full sm:w-auto"><?php echo $item->deskripsi; ?></span>
-                                                </div>
-                                                
-                                                <div class="flex-shrink-0 ml-auto flex items-center space-x-2">
-                                                    <?php if ($item->foto_bukti): ?>
-                                                        <a href="<?php echo base_url($item->foto_bukti); ?>" target="_blank" class="btn btn-xs bg-primary-500 text-white hover:bg-primary-600">
-                                                            <i data-feather="image" class="w-3 h-3 mr-1"></i> Bukti Foto
-                                                        </a>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if ($item->tipe_item == 'checklist'): ?>
-                                                        <a href="<?php echo site_url('admin/item_history/' . $item->id); ?>" class="btn btn-xs bg-secondary-500 text-white hover:bg-secondary-600" 
-                                                                title="Lihat Riwayat Aksi">
-                                                            <i data-feather="clock" class="w-4 h-4"></i> Riwayat
-                                                        </a>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                            
-                                            <?php if ($item->catatan): ?>
-                                                <div class="mt-2 w-full p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs border border-gray-200 dark:border-gray-600">
-                                                    <strong class="text-primary-500 inline-flex items-center mr-1"><i data-feather="message-square" class="w-3 h-3 mr-1"></i> Catatan Eksekutor:</strong> 
-                                                    <span class="text-gray-700 dark:text-gray-300"><?php echo nl2br(html_escape($item->catatan)); ?></span>
-                                                </div>
-                                            <?php endif; ?>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>
 
 <script>
-    // Pastikan feather icons di-replace setelah konten dimuat
+    // Memastikan feather icons dimuat
     if (typeof feather !== 'undefined') {
         feather.replace();
     }
