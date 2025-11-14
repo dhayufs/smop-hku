@@ -34,6 +34,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <h6 class="font-semibold mb-3"><i data-feather="plus" class="w-4 h-4 mr-1 inline-block"></i> Tambah Item Baru</h6>
                     <?php echo form_open('admin/add_template_item/' . $template->id, 'class="grid grid-cols-12 gap-x-4"'); ?>
                         
+                        <div class="form-group col-span-12 md:col-span-10 mb-4">
+                            <label class="text-sm font-medium">Tugas</label>
+                            <input type="text" name="deskripsi_item" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group col-span-12 md:col-span-2 mb-4 self-end">
+                            <button type="submit" class="btn bg-success-500 text-white hover:bg-success-600 w-full">
+                                <i data-feather="plus" class="w-4 h-4 mr-2 inline-block"></i> Tambah
+                            </button>
+                        </div>
+                        
                         <div class="form-group col-span-12 md:col-span-3 mb-3">
                             <label class="text-sm font-medium">Blok Tugas</label>
                             <select name="tipe_blok" class="form-control" required>
@@ -47,6 +58,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <input type="number" name="hari_ke" class="form-control" min="1" required>
                             <small class="text-muted block">Max M: <?php echo $template->lama_manasik; ?>, Max P: <?php echo $template->lama_perjalanan; ?></small>
                         </div>
+                        
                         <div class="form-group col-span-12 md:col-span-2 mb-3">
                             <label class="text-sm font-medium">Jenis Item</label>
                             <select name="tipe_item" id="tipe_item_add" class="form-control" required>
@@ -69,23 +81,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <select name="pj_user_id_default" class="form-control">
                                 <option value="">-- Pilih User --</option>
                                 <?php foreach ($users as $u): ?>
-                                    <?php if ($u->system_role === 'tim_lapangan'): ?>
+                                    <?php if ($u->system_role === 'user'): // Perbaikan: 'tim_lapangan' diganti 'user' ?>
                                         <option value="<?php echo $u->id; ?>"><?php echo $u->nama_lengkap; ?></option>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         
-                        <div class="form-group col-span-12 md:col-span-10 mb-4">
-                            <label class="text-sm font-medium">Deskripsi Item</label>
-                            <textarea name="deskripsi_item" class="form-control" rows="1" required></textarea>
-                        </div>
-                        
-                        <div class="form-group col-span-12 md:col-span-2 mb-4 self-end">
-                            <button type="submit" class="btn bg-success-500 text-white hover:bg-success-600 w-full">
-                                <i data-feather="plus" class="w-4 h-4 mr-2 inline-block"></i> Tambah
-                            </button>
-                        </div>
                     <?php echo form_close(); ?>
                 </div>
 
@@ -152,7 +154,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                         <select name="pj_user_id_default" class="form-control form-control-sm w-full">
                                                             <option value="">-- Pilih User --</option>
                                                             <?php foreach ($users as $u): ?>
-                                                                <?php if ($u->system_role === 'tim_lapangan'): ?>
+                                                                <?php if ($u->system_role === 'user'): // Perbaikan: 'tim_lapangan' diganti 'user' ?>
                                                                     <option value="<?php echo $u->id; ?>" <?php echo ($item->pj_user_id_default == $u->id) ? 'selected' : ''; ?>>
                                                                         <?php echo $u->nama_lengkap; ?>
                                                                     </option>
@@ -164,8 +166,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                 </div>
 
                                                 <div class="col-span-12 md:col-span-5 mt-3 md:mt-0 form-group mb-0">
-                                                    <label class="text-sm font-medium block mb-1">Deskripsi Item (Urutan: <?php echo $item->urutan; ?>)</label>
-                                                    <textarea name="deskripsi_item" class="form-control form-control-sm" rows="3" required><?php echo $item->deskripsi_item; ?></textarea>
+                                                    <label class="text-sm font-medium block mb-1">Tugas (Urutan: <?php echo $item->urutan; ?>)</label>
+                                                    <input type="text" name="deskripsi_item" class="form-control form-control-sm" value="<?php echo $item->deskripsi_item; ?>" required>
                                                 </div>
                                                 
                                                 <div class="col-span-12 md:col-span-4 mt-3 md:mt-0 flex flex-col justify-start space-y-3">
