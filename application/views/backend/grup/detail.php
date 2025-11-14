@@ -13,7 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     
     <div class="grid grid-cols-12 gap-x-6">
         
-        <div class="col-span-12 lg:col-span-4">
+        <div class="col-span-12 lg:col-span-3">
             <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
                 <div class="card-header border-b border-gray-200 dark:border-gray-700 p-4 bg-primary-500 text-white">
                     <h6 class="mb-0 font-medium"><i data-feather="info" class="w-4 h-4 mr-2 inline-block"></i> Ringkasan Grup</h6>
@@ -35,14 +35,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <a href="<?php echo site_url('admin/grup_form/' . $grup->id); ?>" class="btn bg-warning-500 text-white hover:bg-warning-600 btn-sm">
                             <i data-feather="repeat" class="w-4 h-4 mr-1 inline-block"></i> Geser Jadwal
                         </a>
-                        <br>
                         <a href="<?php echo site_url('admin/delete_grup/' . $grup->id); ?>" class="btn bg-danger-500 text-white hover:bg-danger-600 btn-sm" onclick="return confirm('Yakin hapus grup ini? SEMUA DATA CHECKLIST AKAN HILANG!');">
                             <i data-feather="trash-2" class="w-4 h-4 mr-1 inline-block"></i> Hapus Grup
                         </a>
                     </div>
                 </div>
             </div>
-            
+        </div>
+
+        <div class="col-span-12 lg:col-span-3">
             <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
                 <div class="card-header border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-800">
                     <h6 class="mb-0 font-medium text-sm"><i data-feather="user-check" class="w-4 h-4 mr-2 inline-block"></i> Tim Lapangan Ditugaskan</h6>
@@ -64,7 +65,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
         </div>
 
-        <div class="col-span-12 lg:col-span-8">
+        <div class="col-span-12 lg:col-span-6">
             <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
                 <div class="card-header border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-100 dark:bg-gray-800">
                     <h5 class="mb-0 font-medium"><i data-feather="activity" class="w-4 h-4 mr-2 inline-block"></i> Live Checklist Monitoring</h5>
@@ -93,36 +94,46 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                             ];
                                             $status_text_color = $item->status == 'Pending' ? 'text-muted' : 'font-bold';
                                         ?>
-                                        <li class="list-group-item d-flex justify-content-between items-center text-sm px-3 py-2 border-b">
-                                            <div class="flex items-center">
-                                                <span class="badge bg-<?php echo $status_class[$item->status]; ?> text-white mr-2"><?php echo $item->status; ?></span>
+                                        <li class="list-group-item text-sm px-3 py-2 border-b">
+                                            <div class="flex flex-wrap items-center justify-between">
+                                                <div class="flex items-center flex-grow min-w-0 mb-1 sm:mb-0">
+                                                    <span class="badge bg-<?php echo $status_class[$item->status]; ?> text-white mr-2 flex-shrink-0"><?php echo $item->status; ?></span>
+                                                    
+                                                    <?php if ($item->tipe_item == 'checklist'): ?>
+                                                        <small class="text-xs text-info-500 mr-2 flex-shrink-0">[PJ: <?php echo $item->pj_nama ? $item->pj_nama : 'Belum Ditugaskan'; ?>]</small>
+                                                    <?php else: ?>
+                                                        <small class="text-xs text-muted mr-2 flex-shrink-0">(! Info)</small>
+                                                    <?php endif; ?>
+                                                    
+                                                    <span class="<?php echo $status_text_color; ?> truncate w-full sm:w-auto"><?php echo $item->deskripsi; ?></span>
+                                                </div>
                                                 
-                                                <?php if ($item->tipe_item == 'checklist'): ?>
-                                                    <small class="text-xs text-info-500 mr-2">[PJ: <?php echo $item->pj_nama ? $item->pj_nama : 'Belum Ditugaskan'; ?>]</small>
-                                                <?php else: ?>
-                                                    <small class="text-xs text-muted mr-2">(! Info)</small>
-                                                <?php endif; ?>
-                                                
-                                                <span class="<?php echo $status_text_color; ?>"><?php echo $item->deskripsi; ?></span>
+                                                <div class="flex-shrink-0 ml-auto flex items-center space-x-2">
+                                                    <?php if ($item->foto_bukti): ?>
+                                                        <a href="<?php echo base_url($item->foto_bukti); ?>" target="_blank" class="btn btn-xs bg-primary-500 text-white hover:bg-primary-600">
+                                                            <i data-feather="image" class="w-3 h-3 mr-1"></i> Bukti Foto
+                                                        </a>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if ($item->tipe_item == 'checklist'): ?>
+                                                        <button type="button" class="btn btn-xs bg-secondary-500 text-white hover:bg-secondary-600" 
+                                                                data-toggle="modal" 
+                                                                data-target="#historyModal" 
+                                                                data-item-id="<?php echo $item->id; ?>"
+                                                                data-deskripsi="<?php echo $item->deskripsi; ?>"
+                                                                title="Lihat Riwayat Aksi">
+                                                            <i data-feather="clock" class="w-4 h-4"></i> Riwayat
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
-                                            <div class="flex items-center space-x-2">
-                                                <?php if ($item->tipe_item == 'checklist'): ?>
-                                                    <button type="button" class="btn btn-sm bg-secondary-500 text-white hover:bg-secondary-600 ml-2" 
-                                                            data-toggle="modal" 
-                                                            data-target="#historyModal" 
-                                                            data-item-id="<?php echo $item->id; ?>"
-                                                            data-deskripsi="<?php echo $item->deskripsi; ?>"
-                                                            title="Lihat Riwayat Aksi">
-                                                        <i data-feather="clock" class="w-4 h-4"></i> Riwayat
-                                                    </button>
-                                                <?php endif; ?>
-                                                
-                                                <?php if ($item->foto_bukti): ?>
-                                                    <a href="<?php echo base_url($item->foto_bukti); ?>" target="_blank" class="badge bg-primary-500 text-white">
-                                                        Lihat Bukti Foto
-                                                    </a>
-                                                <?php endif; ?>
-                                            </div>
+                                            
+                                            <?php if ($item->catatan): ?>
+                                                <div class="mt-2 w-full p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs border border-gray-200 dark:border-gray-600">
+                                                    <strong class="text-primary-500 inline-flex items-center mr-1"><i data-feather="message-square" class="w-3 h-3 mr-1"></i> Catatan Eksekutor:</strong> 
+                                                    <span class="text-gray-700 dark:text-gray-300"><?php echo nl2br(html_escape($item->catatan)); ?></span>
+                                                </div>
+                                            <?php endif; ?>
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>
@@ -130,27 +141,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="historyModal" tabindex="-1" role="dialog" aria-labelledby="historyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary-500 text-white">
-                <h5 class="modal-title" id="historyModalLabel">Riwayat Aksi Item: <span id="item_desc_title"></span></h5>
-                <button type="button" class="close text-white opacity-100" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <ul class="list-group" id="history_list">
-                    <li class="list-group-item text-center text-muted">Memuat riwayat...</li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -187,7 +177,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     
                     response.forEach(function(history) {
                         // Perbaikan: Konversi timestamp ke Date object untuk formatting
-                        // Perlu dipastikan format timestamp dari database agar konversi ini berhasil.
                         // Asumsi: history.timestamp adalah string tanggal yang bisa diterima new Date()
                         var logDate = new Date(history.timestamp);
                         var formattedTime = logDate.toLocaleString('id-ID', { 
