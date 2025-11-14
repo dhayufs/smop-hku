@@ -23,20 +23,36 @@ class Admin extends CI_Controller {
         }
     }
     
-    // --- Fungsi AJAX untuk Log Riwayat Item ---
-    public function get_item_history_ajax($grup_item_id)
+    // --- FUNGSI BARU: Halaman Riwayat Item (Menggantikan Modal/AJAX) ---
+    public function item_history($grup_item_id)
     {
-        // Pastikan permintaan adalah AJAX (opsional, tapi disarankan)
-        if (!$this->input->is_ajax_request()) {
-            show_404();
+        // Pastikan Item ditemukan dan ambil detailnya
+        $this->load->model('Grup_model');
+        $this->load->model('User_model');
+        
+        $item = $this->Grup_model->get_grup_item_detail($grup_item_id);
+        if (!$item) {
+            $this->session->set_flashdata('error', 'Item tugas tidak ditemukan.');
+            redirect('admin/monitoring');
         }
+
+        $grup_id = $item->grup_id;
+        $grup = $this->Grup_model->get_grup_by_id($grup_id);
         
-        $history = $this->Grup_model->get_item_history($grup_item_id);
+        if (!$grup) {
+            $this->session->set_flashdata('error', 'Grup terkait tidak ditemukan.');
+            redirect('admin/monitoring');
+        }
+
+        $data['title'] = 'Riwayat Aksi: ' . $item->deskripsi;
+        $data['item'] = $item;
+        $data['grup'] = $grup;
+        // Mengambil riwayat dari tabel_riwayat_item
+        $data['riwayat'] = $this->Grup_model->get_item_history_with_user($grup_item_id); 
         
-        // Output dalam format JSON
-        $this->output
-             ->set_content_type('application/json')
-             ->set_output(json_encode($history));
+        $this->load->view('backend/layouts/header', $data);
+        $this->load->view('backend/grup/history_detail', $data); // View baru
+        $this->load->view('backend/layouts/footer');
     }
 
     // --- 1. HALAMAN UTAMA (ROOT /ADMIN) - KALIMAT PEMBUKA (REVISI BARU) ---
