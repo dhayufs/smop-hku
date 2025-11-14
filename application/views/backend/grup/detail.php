@@ -110,15 +110,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                 
                                                 <div class="flex-shrink-0 ml-auto flex items-center space-x-2">
                                                     <?php if ($item->foto_bukti): ?>
-                                                        <a href="<?php echo base_url($item->foto_bukti); ?>" target="_blank" class="btn btn-xs bg-primary-500 text-white hover:bg-primary-600">
-                                                            <i data-feather="image" class="w-3 h-3 mr-1"></i> Bukti Foto
+                                                        <a href="<?php echo base_url($item->foto_bukti); ?>" target="_blank" class="btn btn-sm bg-primary-500 text-white hover:bg-primary-600">
+                                                            <i data-feather="image" class="w-1 h-1 mr-1"></i>📷 Bukti Foto
                                                         </a>
                                                     <?php endif; ?>
                                                     
                                                     <?php if ($item->tipe_item == 'checklist'): ?>
-                                                        <a href="<?php echo site_url('admin/item_history/' . $item->id); ?>" class="btn btn-xs bg-secondary-500 text-white hover:bg-secondary-600" 
-                                                                title="Lihat Riwayat Aksi">
-                                                            <i data-feather="clock" class="w-4 h-4"></i> Riwayat
+                                                        <a href="<?php echo site_url('admin/item_history/' . $item->id); ?>" class="btn btn-sm bg-secondary-500 text-white hover:bg-secondary-600" 
+                                                            <i data-feather="clock" class="w-1 h-1 mr-1"></i>🕗 Riwayat
                                                         </a>
                                                     <?php endif; ?>
                                                 </div>
