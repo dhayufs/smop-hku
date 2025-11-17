@@ -24,32 +24,32 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <table class="table table-hover w-full whitespace-nowrap">
                         <thead>
                             <tr class="text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700">
-                                <th class="py-2 px-3 text-left">WAKTU LAPOR</th>
+                                <th class="py-2 px-3 text-left">WAKTU LAPOR (WIB | KSA)</th>
                                 <th class="py-2 px-3 text-left">GRUP & ITEM</th>
                                 <th class="py-2 px-3 text-left">PESAN NOTIFIKASI</th>
-                                <th class="py-2 px-3 text-center">STATUS BACA</th>
                                 <th class="py-2 px-3 text-center">AKSI</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($notifications as $notif): ?>
                             <?php
-                                $waktu = date('d M Y H:i', strtotime($notif->created_at));
-                                $status_baca_class = $notif->is_read ? 'bg-secondary-500' : 'bg-warning-500';
-                                $status_baca_text = $notif->is_read ? 'Sudah Dibaca' : 'Baru';
+                                $dt_wib = new DateTime($notif->created_at, new DateTimeZone('Asia/Jakarta'));
+                                $dt_ksa = clone $dt_wib;
+                                $dt_ksa->setTimezone(new DateTimeZone('Asia/Riyadh'));
+                                
+                                $wib_time_full = $dt_wib->format('d M Y H:i') . ' WIB';
+                                $ksa_time_only = $dt_ksa->format('H:i') . ' KSA';
+                                $waktu_full = $wib_time_full . ' | ' . $ksa_time_only;
                             ?>
                             <tr class="text-sm border-t border-theme-border dark:border-themedark-border">
-                                <td class="py-3 px-3 text-left"><?php echo $waktu; ?></td>
+                                <td class="py-3 px-3 text-left"><?php echo $waktu_full; ?></td>
                                 <td class="py-3 px-3 text-left">
                                     <p class="font-medium"><?php echo isset($notif->nama_grup) ? $notif->nama_grup : 'N/A'; ?></p>
                                     <small class="text-muted block">Item: <?php echo $notif->deskripsi; ?></small>
                                 </td>
-                                <td class="py-3 px-3 font-medium text-danger-600"><?php echo $notif->pesan; ?></td>
+                                <td class="py-3 px-3 font-medium text-danger-600 whitespace-normal" style="word-break: break-all;"><?php echo $notif->pesan; ?></td>
                                 <td class="py-3 px-3 text-center">
-                                    <span class="badge <?php echo $status_baca_class; ?> text-white"><?php echo $status_baca_text; ?></span>
-                                </td>
-                                <td class="py-3 px-3 text-center">
-                                    <a href="<?php echo site_url('admin/grup_detail/' . $notif->grup_item_id); ?>" class="btn btn-sm bg-danger-500 text-white hover:bg-danger-600" title="Tindak Lanjut">
+                                    <a href="<?php echo site_url('admin/item_history/' . $notif->grup_item_id); ?>" class="btn btn-sm bg-danger-500 text-white hover:bg-danger-600" title="Tindak Lanjut Detail Item">
                                         <i data-feather="alert-octagon" class="w-4 h-4"></i> Tindak Lanjut
                                     </a>
                                 </td>
