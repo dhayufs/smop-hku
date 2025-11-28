@@ -797,10 +797,102 @@ class Admin extends CI_Controller {
         }
         $data['grouped_items'] = $grouped_items;
         
+        // --- START TAMBAHAN BARU UNTUK EDIT CHECKLIST LIVE ---
+        $data['peran'] = $this->User_model->get_all_peran(); 
+        $data['users'] = $this->User_model->get_all_users();
+        // --- END TAMBAHAN BARU UNTUK EDIT CHECKLIST LIVE ---
+        
         $data = $this->_get_header_data($data); // <--- TAMBAH
         $this->load->view('backend/layouts/header', $data);
         $this->load->view('backend/grup/detail', $data); 
         $this->load->view('backend/layouts/footer');
+    }
+    
+    // --- FUNGSI BARU: Aksi Edit Item Live Checklist (di Grup) ---
+    public function edit_grup_item_action($grup_id, $item_id)
+    {
+        // Pastikan Grup dan Item ditemukan dan ambil detailnya
+        $grup = $this->Grup_model->get_grup_by_id($grup_id);
+        // Asumsi Grup_model memiliki fungsi untuk mengambil detail item grup
+        $item = $this->Grup_model->get_grup_item_detail($item_id); 
+        
+        if (!$grup || !$item || $item->grup_id != $grup_id) {
+            $this->session->set_flashdata('error', 'Grup atau Item tidak valid.');
+            redirect('admin/grup_detail/' . $grup_id);
+            return;
+        }
+
+        $this->form_validation->set_rules('tipe_item', 'Jenis Item', 'required|in_list[info,checklist]');
+        $this->form_validation->set_rules('deskripsi_item', 'Deskripsi Item', 'required');
+        
+        $pj_peran_id = NULL;
+        $pj_user_id = NULL; // Nama field di tabel Grup Item seharusnya pj_user_id, bukan pj_user_id_default
+
+        if ($this->input->post('tipe_item') == 'checklist') {
+            $this->form_validation->set_rules('pj_peran_id', 'Penanggung Jawab Peran', 'required|integer');
+            $pj_peran_id = $this->input->post('pj_peran_id');
+            
+            // Mengambil User PJ yang baru (Admin bisa mengubah PJ Live Item)
+            $pj_user_id = $this->input->post('pj_user_id') ? $this->input->post('pj_user_id') : NULL;
+        }
+
+        if ($this->form_validation->run() == FALSE)
+        {
+            $this->session->set_flashdata('error_form_edit_' . $item_id, validation_errors());
+            redirect('admin/grup_detail/' . $grup_id);
+            return;
+        }
+        
+        // Data yang di-update di item live checklist (tabel_grup_item)
+        $data = array(
+            'tipe_item'             => $this->input->post('tipe_item'),
+            'deskripsi'             => $this->input->post('deskripsi_item'), 
+            'peran_tugas_id'        => $pj_peran_id, // <-- PERBAIKAN: Menggunakan nama kolom DB yang benar: peran_tugas_id
+            'pj_user_id'            => $pj_user_id 
+        );
+
+        // Asumsikan ada fungsi update_grup_item di Grup_model
+        if ($this->Grup_model->update_grup_item($item_id, $data)) {
+            $this->session->set_flashdata('success', 'Item live checklist berhasil diperbarui.');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal memperbarui item live checklist.');
+        }
+        
+        redirect('admin/grup_detail/' . $grup_id);
+    }
+    
+    // --- FUNGSI BARU: Aksi Reorder Item Live Checklist ---
+    public function reorder_grup_item($grup_id, $item_id, $direction)
+    {
+        // Asumsikan ada fungsi reorder_grup_item di Grup_model
+        if ($this->Grup_model->reorder_grup_item($item_id, $direction)) {
+            $this->session->set_flashdata('success', 'Posisi item live checklist berhasil dipindahkan.');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal memindahkan posisi item live checklist (mungkin sudah di posisi teratas/terbawah).');
+        }
+        redirect('admin/grup_detail/' . $grup_id);
+    }
+    
+    // --- FUNGSI BARU: Hapus Item Live Checklist ---
+    public function delete_grup_item($grup_id, $item_id)
+    {
+        // Pastikan Grup dan Item ditemukan dan ambil detailnya
+        $grup = $this->Grup_model->get_grup_by_id($grup_id);
+        $item = $this->Grup_model->get_grup_item_detail($item_id); // Asumsikan ada fungsi ini
+        
+        if (!$grup || !$item || $item->grup_id != $grup_id) {
+            $this->session->set_flashdata('error', 'Grup atau Item tidak valid.');
+            redirect('admin/grup_detail/' . $grup_id);
+            return;
+        }
+        
+        // Asumsikan ada fungsi delete_grup_item di Grup_model
+        if ($this->Grup_model->delete_grup_item($item_id)) {
+            $this->session->set_flashdata('success', 'Item live checklist berhasil dihapus.');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal menghapus item live checklist.');
+        }
+        redirect('admin/grup_detail/' . $grup_id);
     }
 
     // --- 8. Notifikasi & Laporan (Area 4) ---
