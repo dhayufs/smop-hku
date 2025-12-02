@@ -73,76 +73,67 @@ $tanggal_target = $tanggal_target ?? NULL;
                         
                         <h6 class="mt-3 mb-0 text-sm font-weight-bold bg-gray-100 p-2 text-primary">Sesi <?php echo ucfirst($blok); ?></h6>
                         
-                        <div class="table-responsive">
-                            <table class="table table-sm table-striped w-full mb-0">
-                                <thead class="bg-white text-black border-b border-gray-400">
-                                    <tr>
-                                        <th class="py-2 px-3 text-center" style="width: 5%">Kategori</th>
-                                        <th class="py-2 px-3">Tugas</th>
-                                        <th class="py-2 px-3 text-center" style="width: 15%">PIC</th>
-                                        <th class="py-2 px-3 text-center" style="width: 10%">Status</th>
-                                        <th class="py-2 px-3 text-center" style="width: 15%">Aksi / Bukti</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($items as $item): ?>
-                                        <?php
-                                            $status_class = ['Pending' => 'secondary', 'Sukses' => 'success', 'Cukup' => 'info', 'Buruk' => 'warning', 'Gagal' => 'danger'];
-                                            $status_label = ['Pending' => 'Pending', 'Sukses' => 'Sukses', 'Cukup' => 'Cukup', 'Buruk' => 'Buruk', 'Gagal' => 'Gagal'];
-                                            $is_my_task = ($item->pj_user_id == $user_id);
-                                            $is_checklist = ($item->tipe_item == 'checklist');
-                                            
-                                            // Tentukan PIC Label
-                                            $pic_label = $item->pj_nama ? $item->pj_nama : 'N/A';
-                                            $pic_star = ($item->pj_user_id == $user_id) ? ' <i class="fa fa-star text-warning"></i>' : '';
-                                            
-                                            // Mengganti **teks** menjadi <strong>teks</strong> pada deskripsi
-                                            $deskripsi_bold = str_replace(['**', '__'], ['<strong>', '</strong>'], $item->deskripsi);
+                        <div class="p-3"> 
+                            <?php foreach ($items as $item): ?>
+                                <?php
+                                    $status_class = ['Pending' => 'secondary', 'Sukses' => 'success', 'Cukup' => 'info', 'Buruk' => 'warning', 'Gagal' => 'danger'];
+                                    $status_label = ['Pending' => 'Pending', 'Sukses' => 'Sukses', 'Cukup' => 'Cukup', 'Buruk' => 'Buruk', 'Gagal' => 'Gagal'];
+                                    $is_my_task = ($item->pj_user_id == $user_id);
+                                    $is_checklist = ($item->tipe_item == 'checklist');
+                                    
+                                    // Tentukan PIC Label
+                                    $pic_label = $item->pj_nama ? $item->pj_nama : 'N/A';
+                                    $pic_star = ($item->pj_user_id == $user_id) ? ' <i class="fa fa-star text-warning"></i>' : '';
+                                    
+                                    // Mengganti **teks** menjadi <strong>teks</strong> pada deskripsi
+                                    $deskripsi_bold = str_replace(['**', '__'], ['<strong>', '</strong>'], $item->deskripsi);
 
-                                            // Tentukan Icon Kategori
-                                            $kategori_icon = ($item->tipe_item == 'checklist') ? '☑️' : '💡';
-                                        ?>
-                                        <tr>
-                                            <td class="text-center"><?php echo $kategori_icon; ?></td>
-                                            <td>
-                                                <?php echo $deskripsi_bold; ?>
-                                            </td>
-                                            <td class="text-center">
-                                                <?php if ($is_checklist): ?>
-                                                    <?php echo $pic_label . $pic_star; ?>
+                                    // Tentukan Icon Kategori
+                                    $kategori_icon = ($item->tipe_item == 'checklist') ? '☑️' : '💡';
+                                ?>
+                                <div class="card mb-3 shadow-sm border-left border-<?php echo $status_class[$item->status]; ?>"> 
+                                    <div class="card-body p-3">
+                                        
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <p class="mb-0 text-sm font-weight-bold text-gray-800 flex-grow-1 mr-2">
+                                                <?php echo $kategori_icon; ?> &nbsp; <?php echo $deskripsi_bold; ?>
+                                            </p>
+                                            <?php if ($is_checklist): ?>
+                                            <span class="badge badge-<?php echo $status_class[$item->status]; ?> ml-auto">
+                                                <?php echo $status_label[$item->status]; ?>
+                                            </span>
+                                            <?php endif; ?>
+                                        </div>
+                                        
+                                        <?php if ($is_checklist): ?>
+                                        <div class="row align-items-center pt-2 mt-2 border-top border-gray-200">
+                                            <div class="col-12 col-md-6 mb-2 mb-md-0">
+                                                <p class="mb-0 text-xs text-muted">PIC:</p>
+                                                <p class="mb-0 text-sm font-weight-bold text-dark"><?php echo $pic_label . $pic_star; ?></p>
+                                            </div>
+                                            <div class="col-12 col-md-6 text-md-right d-flex flex-column align-items-md-end">
+                                                <?php if ($is_my_task): ?>
+                                                    <a href="<?php echo site_url('mytasks/update_task_form/' . $item->id); ?>" class="btn btn-sm btn-primary py-1 px-2 mb-1 w-100 w-md-auto"><i class="fa fa-edit"></i> Aksi</a>
+                                                <?php else: ?>
+                                                    <button class="btn btn-sm btn-secondary py-1 px-2 mb-1 w-100 w-md-auto disabled" title="Hanya PIC yang terdaftar yang bisa edit">
+                                                        <i class="fa fa-lock"></i> Hanya PIC
+                                                    </button>
                                                 <?php endif; ?>
-                                            </td>
-                                            <td class="text-center">
-                                                <?php if ($is_checklist): ?>
-                                                    <span class="badge badge-<?php echo $status_class[$item->status]; ?>">
-                                                        <?php echo $status_label[$item->status]; ?>
-                                                    </span>
+                                                
+                                                <?php if ($item->foto_bukti): ?>
+                                                    <button type="button" class="btn btn-sm btn-success py-1 px-2 mt-1 w-100 w-md-auto"
+                                                            data-toggle="modal" 
+                                                            data-target="#buktiModal"
+                                                            data-foto-url="<?php echo base_url($item->foto_bukti); ?>">
+                                                        <i class="fa fa-camera"></i> Bukti
+                                                    </button>
                                                 <?php endif; ?>
-                                            </td>
-                                            <td class="text-center">
-                                                <?php if ($is_checklist): ?>
-                                                    <?php if ($is_my_task): ?>
-                                                        <a href="<?php echo site_url('mytasks/update_task_form/' . $item->id); ?>" class="btn btn-sm btn-primary py-1 px-2"><i class="fa fa-edit"></i> Aksi</a>
-                                                    <?php else: ?>
-                                                        <button class="btn btn-sm btn-secondary py-1 px-2 disabled" title="Hanya PIC yang terdaftar yang bisa edit">
-                                                            <i class="fa fa-lock"></i> Hanya PIC
-                                                        </button>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if ($item->foto_bukti): ?>
-                                                        <button type="button" class="btn btn-sm btn-success py-1 px-2 mt-1 mt-md-0"
-                                                                data-toggle="modal" 
-                                                                data-target="#buktiModal"
-                                                                data-foto-url="<?php echo base_url($item->foto_bukti); ?>">
-                                                            <i class="fa fa-camera"></i> Bukti
-                                                        </button>
-                                                    <?php endif; ?>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
                         <?php endforeach; ?>
                     </div>
@@ -169,5 +160,10 @@ $tanggal_target = $tanggal_target ?? NULL;
 </div>
 
 <script>
-    // Hanya untuk memastikan skrip bootstrap collapse bekerja
+    $('#buktiModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var fotoUrl = button.data('foto-url');
+        var modal = $(this);
+        modal.find('#modalFotoBukti').attr('src', fotoUrl);
+    });
 </script>
