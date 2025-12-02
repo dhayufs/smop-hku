@@ -385,6 +385,7 @@ class Grup_model extends CI_Model {
             $tanggal_item_baru = NULL;
             $temp_tgl = clone $tgl_baru_obj;
 
+            // Logika perhitungan tanggal item berdasarkan hari_ke blueprint
             if ($blueprint->tipe_blok === 'manasik') {
                 $temp_tgl->sub(new DateInterval('P' . $blueprint->hari_ke . 'D'));
             } elseif ($blueprint->tipe_blok === 'perjalanan') {

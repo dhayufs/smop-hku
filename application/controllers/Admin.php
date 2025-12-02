@@ -738,6 +738,7 @@ class Admin extends CI_Controller {
         }
 
         // 2. Ambil Semua Item Master (Blueprint) dan Buat Map
+        // Asumsi Template_model memiliki fungsi get_all_template_items_by_template_id
         $listTemplateItemMaster = $this->Template_model->get_all_template_items_by_template_id($grup->template_asal_id);
         $mapTemplateItems = [];
         foreach ($listTemplateItemMaster as $itemMaster) {
