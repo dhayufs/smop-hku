@@ -1,6 +1,30 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+// === NEW: DEFINE format_indo_date GLOBALLY TO PREVENT ERROR ===
+if (!function_exists('format_indo_date')) {
+    function format_indo_date($date_string) {
+        // Daftar nama hari dan bulan dalam Bahasa Indonesia
+        $hari = array('Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu');
+        $bulan = array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember');
+        
+        // Konversi string tanggal ke timestamp
+        $date = strtotime($date_string);
+        // Ambil index hari (0=Minggu, 6=Sabtu)
+        $w = date('w', $date);
+        // Ambil tanggal
+        $tgl = date('d', $date);
+        // Ambil index bulan (1-12)
+        $bln = date('n', $date);
+        // Ambil tahun
+        $thn = date('Y', $date);
+        
+        // Gabungkan dan kembalikan format: Hari, DD Bulan YYYY
+        return $hari[$w] . ', ' . $tgl . ' ' . $bulan[$bln] . ' ' . $thn;
+    }
+}
+// ======================================================================
+
 class MyTasks extends CI_Controller {
 
     public function __construct()
@@ -36,12 +60,13 @@ class MyTasks extends CI_Controller {
         }
         
         // LANGKAH PENTING: Ambil semua peran dari database
-        $all_peran = $this->User_model->get_all_peran();
+        $all_peran = $this->User_model->get_all_peran(); 
         $data['all_peran_names'] = array_column($all_peran, 'nama_peran'); // Ambil array nama-nama peran
         
-        $this->load->view('frontend/layouts/header', $data);
+        // REVISI: Menggunakan template frontend (Bukan lagi backend)
+        $this->load->view('frontend/layouts/header', $data); // DIUBAH
         $this->load->view('frontend/mytasks/index', $data); // View Utama yang diubah
-        $this->load->view('frontend/layouts/footer');
+        $this->load->view('frontend/layouts/footer'); // DIUBAH
     }
     
     // --- 2. Tampilan Detail Grup (Tugas Per Tanggal) - Point 3 & 4 ---
@@ -74,9 +99,10 @@ class MyTasks extends CI_Controller {
         // Ambil tanggal terakhir diupdate dari session (Langkah 3)
         $data['tanggal_target'] = $this->session->flashdata('tanggal_target') ?? NULL;
 
-        $this->load->view('frontend/layouts/header', $data);
+        // REVISI: Menggunakan template frontend (Bukan lagi backend)
+        $this->load->view('frontend/layouts/header', $data); // DIUBAH
         $this->load->view('frontend/mytasks/grup_detail_tasks', $data); // View Detail Baru
-        $this->load->view('frontend/layouts/footer');
+        $this->load->view('frontend/layouts/footer'); // DIUBAH
     }
 
     // --- 3. Tampilan Form Update Tugas (Bukan Modal) - Point 5 ---
@@ -100,9 +126,10 @@ class MyTasks extends CI_Controller {
         // Ambil Log Riwayat (tabel_riwayat_item)
         $data['riwayat'] = $this->Grup_model->get_item_history_with_user($grup_item_id);
 
-        $this->load->view('frontend/layouts/header', $data);
+        // REVISI: Menggunakan template frontend (Bukan lagi backend)
+        $this->load->view('frontend/layouts/header', $data); // DIUBAH
         $this->load->view('frontend/mytasks/update_task_form', $data); // View Form Update Baru
-        $this->load->view('frontend/layouts/footer');
+        $this->load->view('frontend/layouts/footer'); // DIUBAH
     }
     
     // --- 4. Logika Update Checklist (Alur C.2) ---

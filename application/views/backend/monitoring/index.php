@@ -2,65 +2,70 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
-<div class="col-span-12">
+<div class="container-xxl flex-grow-1 container-p-y">
     
     <?php if (!empty($notifikasi_admin)): ?>
-        <div class="alert alert-warning bg-yellow-100 text-yellow-800 p-3 rounded mb-4 d-flex justify-between items-center">
-            🔔 <?php echo count($notifikasi_admin); ?> Notifikasi Baru! Ada tugas yang dilaporkan Buruk/Gagal oleh tim lapangan.
-            <a href="<?php echo site_url('admin/notifications'); ?>" class="btn bg-warning-500 text-white hover:bg-warning-600 btn-sm">Lihat Detail</a>
+        <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bx bx-bell me-2"></i> 
+                <strong><?php echo count($notifikasi_admin); ?> Notifikasi Baru!</strong> Ada tugas yang dilaporkan Buruk/Gagal oleh tim lapangan.
+            </div>
+            <a href="<?php echo site_url('admin/notifications'); ?>" class="btn btn-warning btn-sm">
+                Lihat Detail <i class="bx bx-right-arrow-alt ms-1"></i>
+            </a>
         </div>
     <?php endif; ?>
 
-    <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6">
-        <div class="card-header border-b border-theme-border dark:border-themedark-border p-4 bg-gray-50 dark:bg-gray-800 flex justify-between items-center">
-            <h5 class="mb-0 font-medium">
-                <i data-feather="activity" class="w-4 h-4 mr-2 inline-block"></i> Grup Aktif (Monitoring Real-time)
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bx bx-line-chart me-2"></i> Grup Aktif (Monitoring Real-time)
             </h5>
-            <a href="<?php echo site_url('admin/grup_form'); ?>" class="btn bg-success-500 text-white hover:bg-success-600">
-                <i data-feather="plus" class="w-4 h-4 mr-2 inline-block"></i> Buat Grup Baru
+            <a href="<?php echo site_url('admin/grup_form'); ?>" class="btn btn-primary">
+                <i class="bx bx-plus me-2"></i> Buat Grup Baru
             </a>
         </div>
         
-        <div class="card-body p-6">
-            <div class="grid grid-cols-12 gap-6">
+        <div class="card-body">
+            <div class="row g-4">
                 
                 <?php if (empty($active_groups)): ?>
-                    <div class="col-span-12 text-center py-5">
-                        <p class="text-muted">Tidak ada Grup Perjalanan yang sedang Aktif atau Persiapan.</p>
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted mb-0">Tidak ada Grup Perjalanan yang sedang Aktif atau Persiapan.</p>
                     </div>
                 <?php endif; ?>
 
                 <?php foreach ($active_groups as $grup): ?>
                     <?php 
-                        // --- Logika Style HIJAU MENYALA untuk Grup Aktif ---
-                        $progress_color = ($grup['progress_persen'] == 100) ? 'bg-success-500' : 
-                                          ($grup['progress_persen'] < 50 ? 'bg-danger-500' : 'bg-warning-500');
-                        $status_badge = ($grup['status_label'] == 'Sedang Berjalan') ? 'bg-success-500' : 'bg-info-500';
+                        // --- Logika Style untuk Grup Aktif ---
+                        $progress_color = ($grup['progress_persen'] == 100) ? 'bg-success' : 
+                                          ($grup['progress_persen'] < 50 ? 'bg-danger' : 'bg-warning');
+                        $status_badge = ($grup['status_label'] == 'Sedang Berjalan') ? 'bg-success' : 'bg-info';
                     ?>
-                    <div class="col-span-12 md:col-span-6 lg:col-span-4">
-                        <div class="card shadow-lg border-2 border-success-500">
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <div class="card h-100 shadow border-3 <?php echo ($grup['status_label'] == 'Sedang Berjalan') ? 'border-success' : 'border-info'; ?>">
                             <div class="card-body p-4">
-                                <h5 class="font-bold text-lg mb-1">
+                                <h5 class="card-title mb-1">
                                     <?php echo $grup['nama_grup']; ?> 
-                                </h5>
-                                <h6 class="card-subtitle mb-3 text-sm">
-                                    <span class="badge <?php echo $status_badge; ?> text-white"><?php echo $grup['status_label']; ?></span>
+                                </h5><br>
+                                <h6 class="card-subtitle mb-3">
+                                    <span class="badge rounded-pill <?php echo $status_badge; ?>"><?php echo $grup['status_label']; ?></span>
                                 </h6>
-                                <p class="text-sm mb-3">
-                                    <i data-feather="calendar" class="w-4 h-4 mr-1 inline-block"></i> Berangkat: <?php echo date('d M Y', strtotime($grup['tanggal_keberangkatan'])); ?>
+                                <p class="card-text small mb-3">
+                                    <i class="bx bx-calendar me-1"></i> Berangkat: <?php echo date('d M Y', strtotime($grup['tanggal_keberangkatan'])); ?>
                                 </p>
 
                                 <div class="mt-4">
-                                    <p class="text-sm font-semibold mb-1">Progres Tugas: <?php echo $grup['progress_persen']; ?>%</p>
-                                    <div>
+                                    <p class="small fw-semibold mb-1">Progres Tugas: <?php echo $grup['progress_persen']; ?>%</p>
+                                    <div class="progress mb-1" style="height: 6px;">
                                         <div class="progress-bar <?php echo $progress_color; ?>" role="progressbar" style="width: <?php echo $grup['progress_persen']; ?>%;" aria-valuenow="<?php echo $grup['progress_persen']; ?>" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <small class="text-muted block">Gagal/Buruk: <span class="font-bold text-danger-500"><?php echo $grup['item_gagal_buruk']; ?></span></small>
+                                    <small class="text-muted d-block">Gagal/Buruk: <span class="fw-bold text-danger"><?php echo $grup['item_gagal_buruk']; ?></span></small>
                                 </div>
 
-                                <div class="d-flex justify-content-between items-center mt-3">
-                                    <a href="<?php echo site_url('admin/grup_detail/' . $grup['grup_id']); ?>" class="btn btn-sm bg-info-500 text-white hover:bg-info-600">
-                                        <i data-feather="eye" class="w-4 h-4 mr-1 inline-block"></i> Detail Monitoring
+                                <div class="d-flex justify-content-end mt-3">
+                                    <a href="<?php echo site_url('admin/grup_detail/' . $grup['grup_id']); ?>" class="btn btn-sm btn-info">
+                                        <i class="bx bx-show me-1"></i> Detail Monitoring
                                     </a>
                                 </div>
                             </div>
@@ -71,40 +76,39 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </div>
     </div>
     
-    <div class="card bg-white dark:bg-themedark-cardbg shadow mb-6 mt-6">
-        <div class="card-header border-b border-theme-border dark:border-themedark-border p-4 bg-gray-50 dark:bg-gray-800">
-            <h5 class="mb-0 font-medium">
-                <i data-feather="archive" class="w-4 h-4 mr-2 inline-block"></i> Grup Selesai / Arsip (Lihat Laporan)
+    <div class="card mt-4">
+        <div class="card-header border-bottom">
+            <h5 class="mb-0">
+                <i class="bx bx-archive me-2"></i> Grup Selesai / Arsip (Lihat Laporan)
             </h5>
         </div>
-        <div class="card-body p-6">
-            <div class="grid grid-cols-12 gap-6">
+        <div class="card-body">
+            <div class="row g-4">
                 <?php if (empty($archived_groups)): ?>
-                    <div class="col-span-12 text-center py-3">
-                        <p class="text-muted">Tidak ada Grup Selesai yang tersimpan dalam arsip 10 hari terakhir.</p>
+                    <div class="col-12 text-center py-3">
+                        <p class="text-muted mb-0">Tidak ada Grup Selesai yang tersimpan dalam arsip 10 hari terakhir.</p>
                     </div>
                 <?php endif; ?>
 
                 <?php foreach ($archived_groups as $grup): ?>
                     <?php 
                         // --- Logika Style ABU-ABU untuk Grup Arsip ---
-                        $status_badge = 'bg-secondary-500';
-                        $card_style = 'opacity: 0.6;';
+                        $status_badge = 'bg-secondary';
                     ?>
-                    <div class="col-span-12 md:col-span-6 lg:col-span-4">
-                        <div class="card shadow-md border border-secondary-500" style="<?php echo $card_style; ?>">
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border border-secondary">
                             <div class="card-body p-4">
-                                <h5 class="font-bold text-lg mb-1"><?php echo $grup['nama_grup']; ?></h5>
-                                <h6 class="card-subtitle mb-3 text-sm">
-                                    <span class="badge <?php echo $status_badge; ?> text-white"><?php echo $grup['status_label']; ?></span>
+                                <h5 class="card-title fw-bold mb-1"><?php echo $grup['nama_grup']; ?></h5>
+                                <h6 class="card-subtitle mb-3 small">
+                                    <span class="badge rounded-pill <?php echo $status_badge; ?>"><?php echo $grup['status_label']; ?></span>
                                 </h6>
-                                <p class="text-sm mb-3">
-                                    <i data-feather="calendar" class="w-4 h-4 mr-1 inline-block"></i> Keberangkatan: <?php echo date('d M Y', strtotime($grup['tanggal_keberangkatan'])); ?>
+                                <p class="card-text small mb-3 text-muted">
+                                    <i class="bx bx-calendar me-1"></i> Keberangkatan: <?php echo date('d M Y', strtotime($grup['tanggal_keberangkatan'])); ?>
                                 </p>
 
-                                <div class="d-flex justify-content-between items-center mt-3">
-                                    <a href="<?php echo site_url('admin/grup_detail/' . $grup['grup_id']); ?>" class="btn btn-sm bg-secondary-500 text-white hover:bg-secondary-600">
-                                        <i data-feather="file-text" class="w-4 h-4 mr-1 inline-block"></i> Lihat Laporan
+                                <div class="d-flex justify-content-end mt-3">
+                                    <a href="<?php echo site_url('admin/grup_detail/' . $grup['grup_id']); ?>" class="btn btn-sm btn-secondary">
+                                        <i class="bx bx-file me-1"></i> Lihat Laporan
                                     </a>
                                 </div>
                             </div>
@@ -115,5 +119,3 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </div>
     </div>
 </div>
-
-<script>if (typeof feather !== 'undefined') { feather.replace(); }</script>

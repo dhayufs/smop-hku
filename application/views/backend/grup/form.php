@@ -44,6 +44,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 
                                 <div class="col-span-12">
                                     <div class="form-group mb-3">
+                                        <label class="text-sm font-medium">Tanggal Mulai Manasik</label>
+                                        <input type="date" name="tanggal_mulai_manasik" class="form-control" value="<?php echo set_value('tanggal_mulai_manasik'); ?>" required>
+                                        <?php echo form_error('tanggal_mulai_manasik', '<small class="text-danger block">', '</small>'); ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-span-12">
+                                    <div class="form-group mb-3">
                                         <label class="text-sm font-medium">Tanggal Keberangkatan (H)</label>
                                         <input type="date" name="tanggal_keberangkatan" class="form-control" value="<?php echo set_value('tanggal_keberangkatan'); ?>" required>
                                         <?php echo form_error('tanggal_keberangkatan', '<small class="text-danger block">', '</small>'); ?>
@@ -107,10 +115,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             </div>
                         </div>
                     </div>
-                    
                     <div class="flex justify-center mt-4">
-                        <button type="submit" class="btn btn-lg bg-success-500 text-white hover:bg-success-600 shadow-2xl">
-                            <i data-feather="zap" class="w-5 h-5 mr-2 inline-block"></i> Buat & Cetak Checklist Live
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-plus me-2"></i> Buat Grup Perjalanan
                         </button>
                     </div>
 

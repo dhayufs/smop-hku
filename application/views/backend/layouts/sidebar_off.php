@@ -5,82 +5,98 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // $user_full_name = $this->session->userdata('nama_lengkap'); 
 ?>
 
-<nav class="pc-sidebar">
-    <div class="navbar-wrapper">
-        <div class="m-header flex items-center py-4 px-6 h-header-height">
-            <a href="<?php echo site_url('admin'); ?>" class="b-brand flex items-center gap-3">
-                <img src="<?php echo base_url('assets/backend/images/logo-white.svg'); ?>" class="img-fluid logo logo-lg" alt="logo" />
-                <img src="<?php echo base_url('assets/backend/images/favicon.svg'); ?>" class="img-fluid logo logo-sm" alt="logo" />
-            </a>
-        </div>
-        <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5" data-simplebar> 
-            <ul class="pc-navbar">
-                
-                <li class="pc-item">
-                    <a href="<?php echo site_url('admin'); ?>" class="pc-link">
-                        <span class="pc-micon"><i data-feather="home"></i></span>
-                        <span class="pc-mtext">Dashboard</span>
-                    </a>
-                </li>
-                
-                <li class="pc-item pc-caption">
-                    <label>Monitoring & Operasional</label>
-                </li>
-                
-                <li class="pc-item">
-                    <a href="<?php echo site_url('admin/monitoring'); ?>" class="pc-link">
-                        <span class="pc-micon"><i data-feather="monitor"></i></span>
-                        <span class="pc-mtext">Monitoring Grup</span>
-                    </a>
-                </li>
-                
-                <li class="pc-item">
-                    <a href="<?php echo site_url('admin/grup_form'); ?>" class="pc-link">
-                        <span class="pc-micon"><i data-feather="plus-circle"></i></span>
-                        <span class="pc-mtext">Buat Grup Baru</span>
-                    </a>
-                </li>
+<nav class="navbar navbar-vertical navbar-expand-xl navbar-light bg-white">
+    <div class="container-fluid">
+        <a class="navbar-brand py-3" href="<?php echo site_url('admin'); ?>">
+            <img src="<?php echo base_url('assets/backend/images/logo-dark.svg'); ?>" alt="logo" />
+        </a>
+        
+        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse" aria-controls="navbarVerticalCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-                <li class="pc-item pc-caption">
-                    <label>Perencanaan & Master Data</label>
-                </li>
-                
-                <li class="pc-item">
-                    <a href="<?php echo site_url('admin/templates'); ?>" class="pc-link">
-                        <span class="pc-micon"><i data-feather="copy"></i></span>
-                        <span class="pc-mtext">Template Itinerary</span>
-                    </a>
-                </li>
-                <li class="pc-item">
-                    <a href="<?php echo site_url('admin/roles'); ?>" class="pc-link">
-                        <span class="pc-micon"><i data-feather="users"></i></span>
-                        <span class="pc-mtext">Master Peran Tugas</span>
-                    </a>
-                </li>
+        <div class="navbar-collapse collapse show" id="navbarVerticalCollapse">
+            <div class="nav-scroller os-host os-theme-dark os-host-resize-disabled os-host-scrollbar-horizontal-hidden os-host-transition os-padding">
+                <ul class="navbar-nav flex-column" id="sideNavbar">
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo site_url('admin'); ?>">
+                            <span class="nav-icon me-2"><i data-feather="home"></i></span>
+                            Dashboard
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <div class="navbar-vertical-label">Monitoring & Operasional</div>
+                        <hr class="border-2 opacity-100 mt-2 mb-1">
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo site_url('admin/monitoring'); ?>">
+                            <span class="nav-icon me-2"><i data-feather="monitor"></i></span>
+                            Monitoring Grup
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo site_url('admin/grup_form'); ?>">
+                            <span class="nav-icon me-2"><i data-feather="plus-circle"></i></span>
+                            Buat Grup Baru
+                        </a>
+                    </li>
 
-                <li class="pc-item pc-caption">
-                    <label>Administrasi & Laporan</label>
-                </li>
-                
-                <li class="pc-item">
-                    <a href="<?php echo site_url('admin/users'); ?>" class="pc-link"><span class="pc-micon"><i data-feather="user"></i></span><span class="pc-mtext">Manajemen User</span></a>
-                </li>
-                
-                <li class="pc-item">
-                    <a href="<?php echo site_url('admin/laporan_kinerja'); ?>" class="pc-link"><span class="pc-micon"><i data-feather="bar-chart-2"></i></span><span class="pc-mtext">Laporan Kinerja</span></a>
-                </li>
-                
-                <li class="pc-item">
-                    <a href="<?php echo site_url('admin/notifications'); ?>" class="pc-link"><span class="pc-micon"><i data-feather="bell"></i></span><span class="pc-mtext">Notifikasi Buruk</span></a>
-                </li>
-                
-                <li class="pc-item">
-                    <a href="<?php echo site_url('auth/logout'); ?>" class="pc-link text-danger">
-                        <span class="pc-micon"><i data-feather="log-out"></i></span>
-                        <span class="pc-mtext">Logout</span>
-                    </a>
-                </li>
-            </ul>
+                    <li class="nav-item">
+                        <div class="navbar-vertical-label">Perencanaan & Master Data</div>
+                        <hr class="border-2 opacity-100 mt-2 mb-1">
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo site_url('admin/templates'); ?>">
+                            <span class="nav-icon me-2"><i data-feather="copy"></i></span>
+                            Template Itinerary
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo site_url('admin/roles'); ?>">
+                            <span class="nav-icon me-2"><i data-feather="users"></i></span>
+                            Master Peran Tugas
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <div class="navbar-vertical-label">Administrasi & Laporan</div>
+                        <hr class="border-2 opacity-100 mt-2 mb-1">
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo site_url('admin/users'); ?>">
+                            <span class="nav-icon me-2"><i data-feather="user"></i></span>
+                            Manajemen User
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo site_url('admin/laporan_kinerja'); ?>">
+                            <span class="nav-icon me-2"><i data-feather="bar-chart-2"></i></span>
+                            Laporan Kinerja
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo site_url('admin/notifications'); ?>">
+                            <span class="nav-icon me-2"><i data-feather="bell"></i></span>
+                            Notifikasi Buruk
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="<?php echo site_url('auth/logout'); ?>" class="nav-link text-danger mt-4">
+                            <span class="nav-icon me-2"><i data-feather="log-out"></i></span>
+                            Logout
+                        </a>
+                    </li>
+                </ul>
+                </div>
         </div>
     </div>
 </nav>

@@ -30,10 +30,23 @@ class Template_model extends CI_Model {
 
     public function delete_template($id)
     {
-        // Karena template_id adalah Foreign Key dengan ON DELETE CASCADE,
-        // semua item di tabel_template_item yang terhubung akan otomatis terhapus.
+        // Memulai transaksi untuk mengatasi Foreign Key Constraint Error (Error 1451)
+        $this->db->trans_start();
+        
+        // 1. Hapus record di tabel_grup yang mereferensi template ini (tabel_grup_ibfk_1).
+        //    Ini dilakukan untuk menghindari error: Cannot delete or update a parent row.
+        $this->db->where('template_asal_id', $id);
+        $this->db->delete('tabel_grup');
+        
+        // 2. Hapus template utama (tabel_template).
+        //    Asumsi: item di tabel_template_item akan terhapus otomatis via ON DELETE CASCADE.
         $this->db->where('id', $id);
-        return $this->db->delete('tabel_template');
+        $this->db->delete('tabel_template');
+        
+        // Menyelesaikan transaksi
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
     }
 
     // --- Item Template (tabel_template_item) ---

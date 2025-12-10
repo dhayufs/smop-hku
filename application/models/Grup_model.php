@@ -77,6 +77,15 @@ class Grup_model extends CI_Model {
          return $this->db->count_all_results('tabel_grup_tim') > 0;
     }
     
+    // FUNGSI BARU (Missing from error): Mengambil daftar nama peran tugas (untuk index mytasks)
+    public function get_all_role_names()
+    {
+        $this->db->select('nama_peran');
+        $this->db->from('tabel_peran_tugas');
+        $this->db->order_by('nama_peran', 'ASC'); 
+        return $this->db->get()->result(); 
+    }
+    
     // --- 2. Logika Inti: Buat Grup dari Template (Alur C.1) ---
     
     public function create_live_group($grup_data, $penugasan_tim, $template_items)
@@ -171,16 +180,86 @@ class Grup_model extends CI_Model {
         return $this->db->get()->result();
     }
     
-    // FUNGSI PENDUKUNG BARU (Point 5): Mengambil detail item
+    // FUNGSI PENDUKUNG BARU (Revisi): Mengambil detail item untuk edit/validasi
+    // Catatan: Fungsi ini menggantikan implementasi sebelumnya di baris 102
     public function get_grup_item_detail($grup_item_id)
     {
-        // --- PERBAIKAN: Memastikan kolom catatan dan foto_bukti diambil ---
-        $this->db->select('gi.*, u.nama_lengkap AS pj_nama');
+        // Mengambil detail item checklist live (tabel_grup_item)
+        $this->db->select('gi.*, pt.nama_peran, u.nama_lengkap AS pj_nama');
         $this->db->from('tabel_grup_item gi');
+        $this->db->join('tabel_peran_tugas pt', 'pt.id = gi.peran_tugas_id', 'left'); // Tambah join peran
         $this->db->join('tabel_users u', 'u.id = gi.pj_user_id', 'left');
         $this->db->where('gi.id', $grup_item_id);
         return $this->db->get()->row();
     }
+    
+    // --- FUNGSI BARU UNTUK EDIT CHECKLIST LIVE DARI ADMIN ---
+    
+    public function update_grup_item($item_id, $data)
+    {
+        // Memperbarui data item checklist live (deskripsi, tipe, pj_peran_id, pj_user_id)
+        $this->db->where('id', $item_id);
+        return $this->db->update('tabel_grup_item', $data);
+    }
+    
+    public function delete_grup_item($item_id)
+    {
+        // Menghapus item live checklist. Asumsikan trigger DB mengurus riwayat terkait
+        $this->db->where('id', $item_id);
+        return $this->db->delete('tabel_grup_item');
+    }
+
+    public function reorder_grup_item($item_id, $direction)
+    {
+        // Panggil fungsi detail untuk mendapatkan data yang diperlukan
+        $item = $this->get_grup_item_detail($item_id);
+        if (!$item) {
+            return FALSE;
+        }
+
+        $current_urutan = $item->urutan;
+        $grup_id = $item->grup_id;
+        $tanggal_item = $item->tanggal_item;
+
+        $this->db->trans_start(); // Mulai transaksi
+
+        if ($direction === 'up') {
+            // Cari item di atasnya (urutan lebih kecil, tanggal sama)
+            $this->db->where('grup_id', $grup_id);
+            $this->db->where('tanggal_item', $tanggal_item);
+            $this->db->where('urutan <', $current_urutan);
+            $this->db->order_by('urutan', 'DESC');
+            $item_tujuan = $this->db->get('tabel_grup_item', 1)->row();
+            
+            if ($item_tujuan) {
+                // Tukar posisi: Item Tujuan (di atas) turun, Item Saat Ini naik
+                $new_urutan = $item_tujuan->urutan;
+                $this->db->where('id', $item_tujuan->id)->update('tabel_grup_item', ['urutan' => $current_urutan]);
+                $this->db->where('id', $item_id)->update('tabel_grup_item', ['urutan' => $new_urutan]);
+            }
+
+        } elseif ($direction === 'down') {
+            // Cari item di bawahnya (urutan lebih besar, tanggal sama)
+            $this->db->where('grup_id', $grup_id);
+            $this->db->where('tanggal_item', $tanggal_item);
+            $this->db->where('urutan >', $current_urutan);
+            $this->db->order_by('urutan', 'ASC');
+            $item_tujuan = $this->db->get('tabel_grup_item', 1)->row();
+
+            if ($item_tujuan) {
+                // Tukar posisi: Item Tujuan (di bawah) naik, Item Saat Ini turun
+                $new_urutan = $item_tujuan->urutan;
+                $this->db->where('id', $item_tujuan->id)->update('tabel_grup_item', ['urutan' => $current_urutan]);
+                $this->db->where('id', $item_id)->update('tabel_grup_item', ['urutan' => $new_urutan]);
+            }
+        }
+        
+        $this->db->trans_complete(); // Selesaikan transaksi
+
+        return $this->db->trans_status(); // Return status transaksi
+    }
+    
+    // --- END FUNGSI BARU UNTUK EDIT CHECKLIST LIVE DARI ADMIN ---
     
     // FUNGSI YANG DIKEMBANGKAN (Point 3 & 4): Mengambil Checklist Live (dikelompokkan)
     public function get_live_checklist_grouped($grup_id)
@@ -315,6 +394,7 @@ class Grup_model extends CI_Model {
             $tanggal_item_baru = NULL;
             $temp_tgl = clone $tgl_baru_obj;
 
+            // Logika perhitungan tanggal item berdasarkan hari_ke blueprint
             if ($blueprint->tipe_blok === 'manasik') {
                 $temp_tgl->sub(new DateInterval('P' . $blueprint->hari_ke . 'D'));
             } elseif ($blueprint->tipe_blok === 'perjalanan') {
