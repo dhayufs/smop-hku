@@ -111,12 +111,31 @@ class MyTasks extends CI_Controller {
         $user_id = $this->session->userdata('user_id');
         $item = $this->Grup_model->get_grup_item_detail($grup_item_id);
         
-        if (!$item || $item->pj_user_id != $user_id) {
-            $this->session->set_flashdata('error', 'Akses ditolak atau tugas tidak ditemukan.');
+        // Item harus ditugaskan ke user ini (pj_user_id) atau user ini adalah anggota tim yang bertugas (peran)
+        // Kita modifikasi logika otorisasi di sini:
+        // Cek 1: Apakah user ini adalah PJ langsung?
+        $is_direct_pj = ($item && $item->pj_user_id == $user_id);
+
+        // Cek 2: Apakah user ini ditugaskan ke peran yang sama dengan item?
+        $is_assigned_to_role = FALSE;
+        if ($item && $item->peran_tugas_id) {
+            $grup_id = $item->grup_id;
+            $penugasan_user = $this->Grup_model->get_grup_tim_penugasan($grup_id);
+            
+            foreach ($penugasan_user as $p) {
+                if ($p->user_id == $user_id && $p->peran_tugas_id == $item->peran_tugas_id) {
+                    $is_assigned_to_role = TRUE;
+                    break;
+                }
+            }
+        }
+        
+        if (!$item || (!$is_direct_pj && !$is_assigned_to_role)) {
+            $this->session->set_flashdata('error', 'Akses ditolak: Anda bukan Pelaksana tugas ini.');
             redirect('mytasks'); 
             return;
         }
-        
+
         $grup = $this->Grup_model->get_grup_by_id($item->grup_id);
 
         $data['title'] = 'Aksi Tugas: ' . $item->deskripsi;

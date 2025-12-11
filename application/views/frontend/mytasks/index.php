@@ -28,12 +28,11 @@
                 <?php $user_id = $this->session->userdata('user_id'); ?>
                 <?php foreach ($assigned_groups as $grup): ?>
                     <?php 
-                        $pic_details = [];
+                        $pic_map = []; // Map: Peran Nama -> User Nama
                         $my_roles = [];
                         
                         foreach ($grup->penugasan as $p) {
-                            $pic_details[] = [
-                                'nama_peran' => $p->nama_peran,
+                            $pic_map[$p->nama_peran] = [
                                 'nama_lengkap' => $p->nama_lengkap,
                                 'is_my_role' => ($p->user_id == $user_id)
                             ];
@@ -80,31 +79,23 @@
                                         <?php 
                                             // Menggunakan array nama peran yang diambil dari Controller untuk menentukan urutan
                                             $all_peran_names = $all_peran_names ?? [];
-                                            $displayed_peran_names = []; // Untuk melacak peran yang sudah ditampilkan
                                             
-                                            // Loop SEMUA nama peran yang ada di database untuk menjaga urutan (walaupun grup ini tidak memiliki peran tersebut)
+                                            // Loop SEMUA nama peran yang ada di database untuk menjaga urutan
                                             foreach ($all_peran_names as $peran_name):
-                                                // Cari detail peran ini di array penugasan grup
-                                                $detail = array_filter($pic_details, function($p) use ($peran_name) {
-                                                    return $p['nama_peran'] === $peran_name;
-                                                });
-
-                                                if (!empty($detail)):
-                                                    $detail = reset($detail); // Ambil elemen pertama
-                                                    $pic_class = $detail['is_my_role'] ? 'text-primary fw-bold' : 'text-body';
-                                                    $pic_icon = $detail['is_my_role'] ? ' <i class="bx bx-star text-warning ms-1"></i>' : '';
+                                                $detail = $pic_map[$peran_name] ?? null;
                                         ?>
                                                 <div class="d-flex justify-content-between py-1">
-                                                    <small class="text-muted" style="width: 40%;"><?php echo $detail['nama_peran']; ?>:</small>
-                                                    <small class="<?php echo $pic_class; ?>"><?php echo $detail['nama_lengkap'] . $pic_icon; ?></small>
+                                                    <small class="text-muted" style="width: 40%;"><?php echo $peran_name; ?>:</small>
+                                                    <?php if ($detail): ?>
+                                                        <?php $pic_class = $detail['is_my_role'] ? 'text-primary fw-bold' : 'text-body'; ?>
+                                                        <?php $pic_icon = $detail['is_my_role'] ? ' <i class="bx bx-star text-warning ms-1"></i>' : ''; ?>
+                                                        <small class="<?php echo $pic_class; ?>"><?php echo $detail['nama_lengkap'] . $pic_icon; ?></small>
+                                                    <?php else: ?>
+                                                         <small class="text-danger fst-italic">N/A</small>
+                                                    <?php endif; ?>
                                                 </div>
                                         <?php 
-                                                    $displayed_peran_names[] = $peran_name;
-                                                endif;
                                             endforeach; 
-                                            
-                                            // Tampilkan peran yang tidak ada penugasan jika diperlukan (saat ini diabaikan)
-                                            // Anda bisa menambahkan logika di sini jika ingin menampilkan peran yang tidak ditugaskan (N/A)
                                         ?>
                                     </div>
                                 </div>

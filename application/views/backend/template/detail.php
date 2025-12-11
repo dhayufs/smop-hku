@@ -120,57 +120,33 @@ $colors_count = count($sneat_day_colors);
 
                                                 <?= form_open('admin/edit_template_item_action/' . $template->id . '/' . $item->id, 'id="' . $form_id . '" class="row g-2 align-items-start"'); ?>
                                                 
-                                                    <div class="col-12 col-md-5 form-group mb-0">
-                                                        <label class="form-label small fw-medium mb-1">Tugas (Urutan: <?= $item->urutan; ?>)</label>
-                                                        <input type="text" name="deskripsi_item" class="form-control form-control-sm" value="<?= $item->deskripsi_item; ?>" required>
-                                                    </div>
-
-                                                    <div class="col-6 col-md-2 form-group mb-0">
-                                                        <label class="form-label small fw-medium mb-1">Tipe Item</label>
-                                                        <select name="tipe_item" class="form-select form-select-sm js-tipe-item-edit">
-                                                            <option value="">-- Pilih Item --</option>
-                                                            <option value="info" <?= ($item->tipe_item=='info')?'selected':''; ?>>📝 Info</option>
-                                                            <option value="checklist" <?= ($item->tipe_item=='checklist')?'selected':''; ?>>✅ Checklist</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-6 col-md-2 form-group mb-0 js-pj-peran-field">
-                                                        <label class="form-label small fw-medium mb-1">PJ Peran</label>
-                                                        <select name="pj_peran_id" class="form-select form-select-sm">
-                                                            <option value="">-- Pilih Peran --</option>
-                                                            <?php foreach($peran as $p): ?>
-                                                            <option value="<?= $p->id; ?>" <?= ($item->pj_peran_id==$p->id)?'selected':''; ?>>
-                                                                <?= $p->nama_peran; ?>
-                                                            </option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-12 col-md-3 form-group mb-0 js-pj-user-field">
-                                                        <label class="form-label small fw-medium mb-1">User Default</label>
-                                                        <select name="pj_user_id_default" class="form-select form-select-sm">
-                                                            <option value="">-- Pilih User --</option>
-                                                            <?php foreach ($users as $u): ?>
-                                                            <?php if ($u->system_role === 'user'): ?>
-                                                            <option value="<?= $u->id; ?>" <?= ($item->pj_user_id_default==$u->id)?'selected':''; ?>>
-                                                                <?= $u->nama_lengkap; ?>
-                                                            </option>
-                                                            <?php endif; ?>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-12 d-flex justify-content-between align-items-center gap-2 mt-2">
-                                                        <div class="d-flex gap-2">
-                                                            <button type="submit" class="btn btn-sm btn-info" title="Simpan Perubahan">
-                                                                <i class="bx bx-save me-1"></i> Simpan
-                                                            </button>
-                                                            <a href="<?= site_url('admin/delete_template_item/' . $template->id . '/' . $item->id); ?>" 
-                                                                class="btn btn-sm btn-danger" title="Hapus Item" onclick="return confirm('Hapus item ini?');">
-                                                                <i class="bx bx-trash me-1"></i> Hapus
-                                                            </a>
+                                                    <div class="col-12 d-flex flex-wrap align-items-start gap-3 mb-3 border-bottom pb-3">
+                                                        
+                                                        <div class="form-group mb-0 flex-grow-1" style="min-width: 150px;">
+                                                            <label class="form-label small fw-medium mb-1">Tipe Item</label>
+                                                            <select name="tipe_item" class="form-select form-select-sm js-tipe-item-edit">
+                                                                <option value="">-- Pilih Item --</option>
+                                                                <option value="info" <?= ($item->tipe_item=='info')?'selected':''; ?>>📝 Info</option>
+                                                                <option value="checklist" <?= ($item->tipe_item=='checklist')?'selected':''; ?>>✅ Checklist</option>
+                                                            </select>
                                                         </div>
-                                                        <div class="d-flex gap-2">
+
+                                                        <div class="form-group mb-0 js-pj-user-field flex-grow-1" style="min-width: 200px;">
+                                                            <label class="form-label small fw-medium mb-1">Pelaksana</label>
+                                                            <select name="pj_user_id_default" class="form-select form-select-sm">
+                                                                <option value="">-- Pilih User --</option>
+                                                                <?php foreach ($users as $u): ?>
+                                                                <?php if ($u->system_role === 'user'): ?>
+                                                                <option value="<?= $u->id; ?>" <?= ($item->pj_user_id_default==$u->id)?'selected':''; ?>>
+                                                                    <?= $u->nama_lengkap; ?>
+                                                                </option>
+                                                                <?php endif; ?>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                            <input type="hidden" name="pj_peran_id" value="<?= $item->pj_peran_id; ?>"> 
+                                                        </div>
+
+                                                        <div class="d-flex align-items-end gap-2">
                                                             <a href="<?= site_url('admin/reorder_item/' . $template->id . '/' . $item->id . '/up'); ?>" 
                                                                 class="btn btn-sm btn-icon btn-primary" title="Pindah Naik">
                                                                 <i class="bx bx-up-arrow-alt"></i>
@@ -180,6 +156,18 @@ $colors_count = count($sneat_day_colors);
                                                                 <i class="bx bx-down-arrow-alt"></i>
                                                             </a>
                                                         </div>
+                                                    </div>
+                                                    <div class="col-12 form-group mb-0">
+                                                        <label class="form-label small fw-medium mb-1">Tugas <?= $item->urutan; ?></label>
+                                                        <textarea name="deskripsi_item" class="form-control form-control-sm" rows="3" required><?= $item->deskripsi_item; ?></textarea>
+                                                    </div>
+                                                    <div class="col-12 d-flex justify-content-end align-items-center gap-2 mt-2 pt-2 border-top">
+                                                        <button type="submit" class="btn btn-sm btn-info" title="Simpan Perubahan">
+                                                            <i class="bx bx-save me-1"></i> Simpan
+                                                        </button>
+                                                        <a href="<?= site_url('admin/delete_template_item/' . $template->id . '/' . $item->id); ?>" class="btn btn-sm btn-danger" title="Hapus Item" onclick="return confirm('Hapus item ini?');">
+                                                            <i class="bx bx-trash me-1"></i> Hapus
+                                                        </a>
                                                     </div>
 
                                                 <?= form_close(); ?>
@@ -200,10 +188,11 @@ $colors_count = count($sneat_day_colors);
                                                     
                                                     <input type="hidden" name="tipe_blok" value="<?= $blok_key; ?>">
                                                     <input type="hidden" name="hari_ke" value="<?= $h; ?>">
+                                                    <input type="hidden" name="pj_peran_id" value=""> 
 
                                                     <div class="col-12 form-group">
                                                         <label class="form-label small">Deskripsi Tugas</label>
-                                                        <input type="text" name="deskripsi_item" class="form-control form-control-sm" required>
+                                                        <textarea name="deskripsi_item" class="form-control form-control-sm" rows="3" required></textarea>
                                                     </div>
                                                     
                                                     <div class="col-6 form-group">
@@ -214,18 +203,8 @@ $colors_count = count($sneat_day_colors);
                                                         </select>
                                                     </div>
                                                     
-                                                    <div class="col-6 form-group js-pj-peran-field-add">
-                                                        <label class="form-label small">PJ Peran</label>
-                                                        <select name="pj_peran_id" class="form-select form-select-sm" required>
-                                                            <option value="">-- Pilih Peran --</option>
-                                                            <?php foreach ($peran as $p): ?>
-                                                                <option value="<?= $p->id; ?>"><?= $p->nama_peran; ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    
-                                                    <div class="col-12 form-group js-pj-user-field-add">
-                                                        <label class="form-label small">User Default (Opsional)</label>
+                                                    <div class="col-6 form-group js-pj-user-field-add">
+                                                        <label class="form-label small">Pelaksana (Opsional)</label>
                                                         <select name="pj_user_id_default" class="form-select form-select-sm">
                                                             <option value="">-- Pilih User --</option>
                                                             <?php foreach ($users as $u): ?>
@@ -268,44 +247,36 @@ $colors_count = count($sneat_day_colors);
         
         if (itineraryListContainer) {
             
-            // Fungsi terpusat untuk toggle field PJ (Peran/User) pada form TAMBAH
+            // Fungsi terpusat untuk toggle field PJ (Pelaksana) pada form TAMBAH
             function toggleAddPjFields(selectElement) {
                 // Temukan '.card-body' terdekat (container form tambah)
                 const addFormContainer = selectElement.closest('.card-body');
                 if (!addFormContainer) return;
 
-                const pjPeranField = addFormContainer.querySelector('.js-pj-peran-field-add');
                 const pjUserField = addFormContainer.querySelector('.js-pj-user-field-add');
-                const pjPeranSelect = pjPeranField.querySelector('select');
+
+                if (!pjUserField) return;
 
                 if (selectElement.value === 'checklist') {
-                    pjPeranField.style.display = 'block';
                     pjUserField.style.display = 'block';
-                    pjPeranSelect.setAttribute('required', 'required');
                 } else {
-                    pjPeranField.style.display = 'none';
                     pjUserField.style.display = 'none';
-                    pjPeranSelect.removeAttribute('required');
                 }
             }
             
-            // Fungsi terpusat untuk toggle field PJ (Peran/User) pada form EDIT
+            // Fungsi terpusat untuk toggle field PJ (Pelaksana) pada form EDIT
             function toggleEditPjFields(selectElement) {
                 const itemCard = selectElement.closest('.js-item-card');
                 if (!itemCard) return;
 
-                const pjPeranField = itemCard.querySelector('.js-pj-peran-field');
                 const pjUserField = itemCard.querySelector('.js-pj-user-field');
-                const pjPeranSelect = pjPeranField.querySelector('select');
+
+                if (!pjUserField) return;
 
                 if (selectElement.value === 'checklist') {
-                    pjPeranField.style.display = 'block';
                     pjUserField.style.display = 'block';
-                    pjPeranSelect.setAttribute('required', 'required');
                 } else {
-                    pjPeranField.style.display = 'none';
                     pjUserField.style.display = 'none';
-                    pjPeranSelect.removeAttribute('required');
                 }
             }
 

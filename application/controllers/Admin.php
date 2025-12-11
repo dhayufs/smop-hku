@@ -472,15 +472,20 @@ class Admin extends CI_Controller {
         $this->form_validation->set_rules('tipe_item', 'Jenis Item', 'required|in_list[info,checklist]');
         $this->form_validation->set_rules('deskripsi_item', 'Deskripsi Item', 'required');
         
-        $pj_peran_id = NULL;
+        // MODIFIKASI: PJ Peran tidak lagi divalidasi karena field dihapus
+        $pj_peran_id = $item->pj_peran_id; // Ambil nilai PJ Peran yang sudah ada
         $pj_user_id_default = NULL; 
 
         if ($this->input->post('tipe_item') == 'checklist') {
-            $this->form_validation->set_rules('pj_peran_id', 'Penanggung Jawab Peran', 'required|integer');
-            $pj_peran_id = $this->input->post('pj_peran_id');
+            // MODIFIKASI: PJ Peran tetap diambil dari hidden input di view
+            $pj_peran_id = $this->input->post('pj_peran_id') ? $this->input->post('pj_peran_id') : $item->pj_peran_id;
             
-            // Validasi dan ambil User Default (Tambahan Baru)
+            // Validasi dan ambil User Default (Pelaksana)
             $pj_user_id_default = $this->input->post('pj_user_id_default') ? $this->input->post('pj_user_id_default') : NULL;
+        } else {
+            // Jika diubah menjadi Info, set PJ Peran dan User ke NULL
+            $pj_peran_id = NULL;
+            $pj_user_id_default = NULL;
         }
 
         if ($this->form_validation->run() == FALSE)
@@ -494,7 +499,7 @@ class Admin extends CI_Controller {
             'tipe_item'             => $this->input->post('tipe_item'),
             'deskripsi_item'        => $this->input->post('deskripsi_item'),
             'pj_peran_id'           => $pj_peran_id,
-            'pj_user_id_default'    => $pj_user_id_default // Menyimpan User Default
+            'pj_user_id_default'    => $pj_user_id_default // Menyimpan Pelaksana
         );
 
         if ($this->Template_model->update_template_item($item_id, $data)) {
@@ -535,11 +540,9 @@ class Admin extends CI_Controller {
         $pj_user_id_default = NULL;
 
         if ($this->input->post('tipe_item') == 'checklist') {
-            $this->form_validation->set_rules('pj_peran_id', 'Penanggung Jawab Peran', 'required|integer');
-            $pj_peran_id = $this->input->post('pj_peran_id');
-            
-            // Ambil User Default (Tambahan Baru)
+            // MODIFIKASI: PJ Peran akan di set NULL dan ambil Pelaksana
             $pj_user_id_default = $this->input->post('pj_user_id_default') ? $this->input->post('pj_user_id_default') : NULL;
+            $pj_peran_id = NULL; // Set NULL karena field sudah dihapus dari view.
         }
 
         if ($this->form_validation->run() == FALSE)
@@ -569,8 +572,8 @@ class Admin extends CI_Controller {
                 'urutan'         => $urutan,
                 'tipe_item'      => $tipe_item,
                 'deskripsi_item' => $this->input->post('deskripsi_item'),
-                'pj_peran_id'    => $pj_peran_id,
-                'pj_user_id_default' => $pj_user_id_default // Menyimpan User Default
+                'pj_peran_id'    => $pj_peran_id, // NULL jika checklist
+                'pj_user_id_default' => $pj_user_id_default // Menyimpan Pelaksana
             );
 
             if ($this->Template_model->create_template_item($data)) {
@@ -619,7 +622,7 @@ class Admin extends CI_Controller {
             // Jika mode Edit/Geser Jadwal
             $data['grup_data'] = $grup_data;
             $data['mode'] = 'edit'; 
-            $data['title'] = 'Edit Tanggal Grup: ' . $grup_data->nama_grup;
+            $data['title'] = 'Edit Grup: ' . $grup_data->nama_grup; // MODIFIKASI JUDUL
             
             // Ambil penugasan saat ini dan konversi ke Map [peran_id] => user_id
             $penugasan = $this->Grup_model->get_grup_tim_penugasan($grup_id);
@@ -631,7 +634,7 @@ class Admin extends CI_Controller {
             $data['peran'] = $this->User_model->get_all_peran();
             $data['users'] = $this->User_model->get_all_users();
 
-            // View edit menggunakan form khusus
+            // View edit menggunakan form khusus (edit_form.php)
             $data = $this->_get_header_data($data); // <--- TAMBAH
             $this->load->view('backend/layouts/header', $data);
             $this->load->view('backend/grup/edit_form', $data); 
@@ -715,7 +718,7 @@ class Admin extends CI_Controller {
         }
     }
     
-    // Logika Inti: Alur Logika C.4 (Edit Tanggal & Geser Massal)
+    // Logika Inti: Alur Logika C.4 (Edit Grup Lengkap + Geser Massal Jika Tanggal Berubah)
     public function edit_grup_action($grup_id)
     {
         $grup = $this->Grup_model->get_grup_by_id($grup_id);
@@ -725,47 +728,91 @@ class Admin extends CI_Controller {
             return;
         }
 
+        // Tambahkan validasi untuk semua field yang bisa diedit
+        $this->form_validation->set_rules('nama_grup', 'Nama Grup', 'required');
+        $this->form_validation->set_rules('template_asal_id', 'Template Asal', 'required|integer');
+        $this->form_validation->set_rules('tanggal_mulai_manasik', 'Tanggal Mulai Manasik', 'required|date');
         $this->form_validation->set_rules('tanggal_keberangkatan', 'Tanggal Keberangkatan Baru', 'required|date');
         
         if ($this->form_validation->run() == FALSE) {
             $this->session->set_flashdata('error_form', validation_errors());
-            $this->grup_form($grup_id);
+            // Gunakan grup_form untuk kembali ke halaman edit
+            $this->grup_form($grup_id); 
             return;
         }
 
-        $tanggal_keberangkatan_baru = $this->input->post('tanggal_keberangkatan');
+        $tanggal_keberangkatan_lama = $grup->tanggal_keberangkatan;
+        $template_id_lama = $grup->template_asal_id;
         
-        // 1. Ambil Data Acuan Template
-        $template = $this->Template_model->get_template_by_id($grup->template_asal_id);
+        $tanggal_keberangkatan_baru = $this->input->post('tanggal_keberangkatan');
+        $tanggal_mulai_manasik_baru = $this->input->post('tanggal_mulai_manasik');
+        $template_id_baru = $this->input->post('template_asal_id');
+
+        // 1. Ambil Data Acuan Template BARU
+        $template = $this->Template_model->get_template_by_id($template_id_baru);
         if (!$template) {
             $this->session->set_flashdata('error', 'Template asal grup tidak ditemukan.');
             redirect('admin/grup_detail/' . $grup_id);
             return;
         }
+        
+        // Hitung Tanggal Pulang BARU
+        $tgl_pulang_obj = new DateTime($tanggal_keberangkatan_baru);
+        $tgl_pulang_obj->add(new DateInterval('P' . ($template->lama_perjalanan - 1) . 'D'));
+        $tanggal_pulang_baru = $tgl_pulang_obj->format('Y-m-d');
 
-        // 2. Ambil Semua Item Master (Blueprint) dan Buat Map
-        $listTemplateItemMaster = $this->Template_model->get_all_template_items_by_template_id($grup->template_asal_id);
-        $mapTemplateItems = [];
-        foreach ($listTemplateItemMaster as $itemMaster) {
-            $mapTemplateItems[$itemMaster->id] = $itemMaster;
+        // Data Update untuk tabel_grup
+        $grup_data_update = [
+            'nama_grup' => $this->input->post('nama_grup'),
+            'template_asal_id' => $template_id_baru,
+            'tanggal_mulai_manasik' => $tanggal_mulai_manasik_baru,
+            'tanggal_keberangkatan' => $tanggal_keberangkatan_baru,
+            'tanggal_pulang' => $tanggal_pulang_baru
+        ];
+
+        // 2. Kumpulkan Data Penugasan Tim
+        $penugasan_tim_baru = [];
+        $peran_tugas = $this->User_model->get_all_peran();
+        foreach ($peran_tugas as $peran) {
+            $user_id = $this->input->post('user_peran_' . $peran->id);
+            if ($user_id && $user_id != '') {
+                $penugasan_tim_baru[$peran->id] = $user_id;
+            }
         }
         
-        // AMBIL TANGGAL MANASIK LAMA (REVISI)
-        $tanggal_mulai_manasik_lama = $grup->tanggal_mulai_manasik; 
+        // 3. Eksekusi Update Info Grup dan Tim
+        $update_berhasil = $this->Grup_model->update_grup_and_tim($grup_id, $grup_data_update, $penugasan_tim_baru);
+        
+        if (!$update_berhasil) {
+            $this->session->set_flashdata('error', 'Gagal memperbarui info grup dan tim. Terjadi kesalahan transaksi.');
+            redirect('admin/grup_detail/' . $grup_id);
+            return;
+        }
+        
+        $perlu_geser_massal = ($tanggal_keberangkatan_baru != $tanggal_keberangkatan_lama || $template_id_baru != $template_id_lama);
 
-        // 3. Eksekusi Logika Inti Penundaan (Alur C.4) - Kirim Tanggal Manasik Lama
-        if ($this->Grup_model->handle_penundaan_grup(
-            $grup_id, 
-            $tanggal_keberangkatan_baru, 
-            $tanggal_mulai_manasik_lama, // <-- KIRIM TANGGAL MANASIK LAMA
-            $template, 
-            $mapTemplateItems
-        )) {
-            $this->session->set_flashdata('success', 'Jadwal grup ' . $grup->nama_grup . ' berhasil digeser ke tanggal ' . date('d M Y', strtotime($tanggal_keberangkatan_baru)) . '. Semua checklist diperbarui.');
+        if ($perlu_geser_massal) {
+             // Jika tanggal keberangkatan atau template berubah, lakukan pembaruan massal item checklist
+             $listTemplateItemMaster = $this->Template_model->get_all_template_items_by_template_id($template_id_baru);
+             $mapTemplateItems = [];
+             foreach ($listTemplateItemMaster as $itemMaster) {
+                 $mapTemplateItems[$itemMaster->id] = $itemMaster;
+             }
+             
+             if ($this->Grup_model->handle_penundaan_grup(
+                $grup_id, 
+                $tanggal_keberangkatan_baru, 
+                $template, 
+                $mapTemplateItems
+            )) {
+                $this->session->set_flashdata('success', 'Grup ' . $grup->nama_grup . ' berhasil diperbarui dan jadwal live checklist telah digeser.');
+            } else {
+                $this->session->set_flashdata('warning', 'Info grup dan tim berhasil diperbarui, NAMUN gagal menggeser jadwal live checklist. Hubungi teknisi.');
+            }
         } else {
-            $this->session->set_flashdata('error', 'Gagal menggeser jadwal grup. Terjadi kesalahan transaksi.');
+             $this->session->set_flashdata('success', 'Grup ' . $grup->nama_grup . ' berhasil diperbarui.');
         }
-        
+
         redirect('admin/grup_detail/' . $grup_id);
     }
     
@@ -800,22 +847,47 @@ class Admin extends CI_Controller {
         $data['grup'] = $grup;
         $data['penugasan'] = $this->Grup_model->get_grup_tim_penugasan($grup_id);
         
+        // --- MODIFIKASI: Ambil data durasi template dan kelompokkan ulang item ---
+        $template = $this->Template_model->get_template_by_id($grup->template_asal_id);
+        if ($template) {
+            $data['lama_manasik'] = $template->lama_manasik;
+            $data['lama_perjalanan'] = $template->lama_perjalanan;
+        } else {
+            $data['lama_manasik'] = 0;
+            $data['lama_perjalanan'] = 0;
+        }
+        
         $live_items = $this->Grup_model->get_live_checklist($grup_id);
-        $grouped_items = [];
+        $grouped_items_by_day_block = [];
         
         foreach ($live_items as $item) {
-            $tgl = $item->tanggal_item;
-            if (!isset($grouped_items[$tgl])) {
-                $grouped_items[$tgl] = [];
+            // Grouping berdasarkan tipe_blok dan hari_ke
+            $key = $item->tipe_blok . '_' . $item->hari_ke;
+            if (!isset($grouped_items_by_day_block[$key])) {
+                $grouped_items_by_day_block[$key] = [
+                    'tipe_blok' => $item->tipe_blok,
+                    'hari_ke' => $item->hari_ke,
+                    'tanggal_item' => $item->tanggal_item, // Simpan tanggal
+                    'list' => []
+                ];
             }
-            $grouped_items[$tgl][] = $item;
+            $grouped_items_by_day_block[$key]['list'][] = $item;
         }
-        $data['grouped_items'] = $grouped_items;
+        $data['grouped_items'] = $grouped_items_by_day_block;
         
-        // --- START TAMBAHAN BARU UNTUK EDIT CHECKLIST LIVE ---
+        // Tambahkan variabel untuk color mapping (sama seperti di template/detail.php)
+        $data['sneat_day_colors'] = [
+            'bg-label-info',    
+            'bg-label-success', 
+            'bg-label-warning', 
+            'bg-label-primary', 
+            'bg-label-secondary', 
+            'bg-label-danger'   
+        ];
+        // --- END MODIFIKASI ---
+        
         $data['peran'] = $this->User_model->get_all_peran(); 
         $data['users'] = $this->User_model->get_all_users();
-        // --- END TAMBAHAN BARU UNTUK EDIT CHECKLIST LIVE ---
         
         $data = $this->_get_header_data($data); // <--- TAMBAH
         $this->load->view('backend/layouts/header', $data);
@@ -840,15 +912,19 @@ class Admin extends CI_Controller {
         $this->form_validation->set_rules('tipe_item', 'Jenis Item', 'required|in_list[info,checklist]');
         $this->form_validation->set_rules('deskripsi_item', 'Deskripsi Item', 'required');
         
-        $pj_peran_id = NULL;
-        $pj_user_id = NULL; // Nama field di tabel Grup Item seharusnya pj_user_id, bukan pj_user_id_default
+        // MODIFIKASI: PJ Peran tidak lagi divalidasi dan diambil dari nilai lama/hidden field
+        $pj_peran_id = $item->peran_tugas_id; 
+        $pj_user_id = NULL; 
 
         if ($this->input->post('tipe_item') == 'checklist') {
-            $this->form_validation->set_rules('pj_peran_id', 'Penanggung Jawab Peran', 'required|integer');
-            $pj_peran_id = $this->input->post('pj_peran_id');
+            $pj_peran_id = $this->input->post('pj_peran_id') ? $this->input->post('pj_peran_id') : $item->peran_tugas_id;
             
-            // Mengambil User PJ yang baru (Admin bisa mengubah PJ Live Item)
+            // Mengambil User PJ yang baru (Pelaksana)
             $pj_user_id = $this->input->post('pj_user_id') ? $this->input->post('pj_user_id') : NULL;
+        } else {
+            // Jika diubah menjadi Info, set PJ Peran dan User ke NULL
+            $pj_peran_id = NULL;
+            $pj_user_id = NULL;
         }
 
         if ($this->form_validation->run() == FALSE)
@@ -862,7 +938,7 @@ class Admin extends CI_Controller {
         $data = array(
             'tipe_item'             => $this->input->post('tipe_item'),
             'deskripsi'             => $this->input->post('deskripsi_item'), 
-            'peran_tugas_id'        => $pj_peran_id, // <-- PERBAIKAN: Menggunakan nama kolom DB yang benar: peran_tugas_id
+            'peran_tugas_id'        => $pj_peran_id, 
             'pj_user_id'            => $pj_user_id 
         );
 
@@ -874,6 +950,67 @@ class Admin extends CI_Controller {
         }
         
         redirect('admin/grup_detail/' . $grup_id);
+    }
+    
+    // FUNGSI BARU: Tambah Item Live Checklist dari Admin
+    public function add_grup_item($grup_id)
+    {
+        $grup = $this->Grup_model->get_grup_by_id($grup_id);
+        if (!$grup) {
+            $this->session->set_flashdata('error', 'Grup tidak ditemukan.');
+            redirect('admin/monitoring');
+            return;
+        }
+
+        $this->form_validation->set_rules('tipe_blok', 'Blok Perjalanan', 'required|in_list[manasik,perjalanan]');
+        $this->form_validation->set_rules('hari_ke', 'Hari Ke', 'required|integer|greater_than_equal_to[1]');
+        $this->form_validation->set_rules('tanggal_item', 'Tanggal Item', 'required|date');
+        $this->form_validation->set_rules('tipe_item', 'Jenis Item', 'required|in_list[info,checklist]');
+        $this->form_validation->set_rules('deskripsi_item', 'Deskripsi Item', 'required');
+        
+        $pj_peran_id = NULL;
+        $pj_user_id = NULL;
+
+        if ($this->input->post('tipe_item') == 'checklist') {
+            // MODIFIKASI: PJ Peran di set NULL dan ambil Pelaksana
+            $pj_user_id = $this->input->post('pj_user_id_default') ? $this->input->post('pj_user_id_default') : NULL;
+            $pj_peran_id = NULL; 
+        }
+
+        if ($this->form_validation->run() == FALSE)
+        {
+            $this->session->set_flashdata('error_form', validation_errors());
+            redirect('admin/grup_detail/' . $grup_id);
+            return;
+        }
+        else
+        {
+            $tanggal_item = $this->input->post('tanggal_item');
+            // Gunakan fungsi baru dari Grup_model untuk mendapatkan urutan terakhir
+            $urutan = $this->Grup_model->get_last_urutan_grup($grup_id, $tanggal_item); 
+
+            $data = array(
+                'grup_id'           => $grup_id,
+                'tipe_blok'         => $this->input->post('tipe_blok'),
+                'hari_ke'           => $this->input->post('hari_ke'),
+                'tanggal_item'      => $tanggal_item,
+                'urutan'            => $urutan,
+                'tipe_item'         => $this->input->post('tipe_item'),
+                'deskripsi'         => $this->input->post('deskripsi_item'),
+                'peran_tugas_id'    => $pj_peran_id, // NULL
+                'pj_user_id'        => $pj_user_id, // Pelaksana
+                'status'            => 'Pending' // Set default status
+            );
+
+            // Gunakan fungsi baru dari Grup_model untuk membuat item live
+            if ($this->Grup_model->create_grup_item_live($data)) {
+                $this->session->set_flashdata('success', 'Item live checklist berhasil ditambahkan.');
+            } else {
+                $this->session->set_flashdata('error', 'Gagal menambahkan item live checklist.');
+            }
+            
+            redirect('admin/grup_detail/' . $grup_id);
+        }
     }
     
     // --- FUNGSI BARU: Aksi Reorder Item Live Checklist ---

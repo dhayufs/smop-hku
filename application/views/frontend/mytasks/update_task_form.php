@@ -11,7 +11,7 @@ if (!function_exists('format_log_time')) {
         $dt_ksa = clone $dt_wib;
         $dt_ksa->setTimezone(new DateTimeZone('Asia/Riyadh'));
         
-        // Output format yang diminta
+        // Asumsi format_indo_date() tersedia melalui controller/helper
         $tanggal_indo = format_indo_date($dt_wib->format('Y-m-d'));
         $wib_time = $dt_wib->format('H:i');
         $ksa_time = $dt_ksa->format('H:i');
@@ -34,7 +34,7 @@ if (!function_exists('format_log_time')) {
 
 <div class="row">
     <div class="col-md-12 mb-4">
-        <a href="<?php echo site_url('mytasks/grup_detail/' . $grup->id); ?>" class="btn btn-sm btn-secondary">
+        <a href="<?php echo site_url('mytasks/grup_detail/' . $grup->id); ?>" class="btn btn-primary">
             <i class="bx bx-arrow-back me-1"></i> Kembali ke Detail Grup
         </a>
     </div>
@@ -56,7 +56,7 @@ if (!function_exists('format_log_time')) {
                     <p class="mb-1"><strong>Grup:</strong> <span class="fw-semibold text-dark"><?php echo $grup->nama_grup; ?></span></p>
                     <p class="mb-1"><strong>Tanggal Item:</strong> <span class="fw-semibold text-dark"><?php echo format_indo_date($item->tanggal_item); ?></span></p>
                     <p class="mb-3">
-                        <strong>PIC:</strong> 
+                        <strong>Pelaksana:</strong> 
                         <span class="text-primary fw-bold"><?php echo $item->pj_nama; ?> 
                             <i class="bx bx-star text-warning"></i>
                         </span>
@@ -66,23 +66,29 @@ if (!function_exists('format_log_time')) {
                     <div class="form-group mb-3">
                         <label for="status" class="form-label">Status Eksekusi Wajib Dipilih</label>
                         <select name="status" id="modal_status" class="form-select" required>
-                            <option value="Sukses" <?php echo ($item->status == 'Sukses') ? 'selected' : ''; ?>>Sukses</option>
-                            <option value="Cukup" <?php echo ($item->status == 'Cukup') ? 'selected' : ''; ?>>Cukup</option>
-                            <option value="Buruk" <?php echo ($item->status == 'Buruk') ? 'selected' : ''; ?>>Buruk</option>
-                            <option value="Gagal" <?php echo ($item->status == 'Gagal') ? 'selected' : ''; ?>>Gagal</option>
+                            <option value="Sukses" <?php echo (set_value('status') == 'Sukses' || $item->status == 'Sukses') ? 'selected' : ''; ?>>Sukses</option>
+                            <option value="Cukup" <?php echo (set_value('status') == 'Cukup' || $item->status == 'Cukup') ? 'selected' : ''; ?>>Cukup</option>
+                            <option value="Buruk" <?php echo (set_value('status') == 'Buruk' || $item->status == 'Buruk') ? 'selected' : ''; ?>>Buruk</option>
+                            <option value="Gagal" <?php echo (set_value('status') == 'Gagal' || $item->status == 'Gagal') ? 'selected' : ''; ?>>Gagal</option>
                         </select>
                         <small class="form-text text-danger">Status Buruk atau Gagal akan memicu notifikasi real-time ke Admin!</small>
                     </div>
                     
                     <div class="form-group mb-3">
                         <label for="catatan" class="form-label">Catatan / Keterangan Tambahan (Opsional)</label>
-                        <textarea name="catatan" id="catatan" class="form-control" rows="3"></textarea>
+                        <textarea name="catatan" id="catatan" class="form-control" rows="3"><?php echo set_value('catatan', $item->catatan); ?></textarea>
                     </div>
 
                     <div class="form-group mb-3">
                         <label class="form-label">Foto Bukti (Maks. 5MB)</label>
                         <input type="file" name="foto_bukti" class="form-control">
                         <small class="form-text text-muted">Upload foto baru untuk tugas ini.</small>
+                        <?php if ($item->foto_bukti): ?>
+                            <div class="mt-2">
+                                <span class="d-block small text-success">Foto saat ini ada. Upload baru akan menimpa yang lama.</span>
+                                <a href="<?php echo base_url($item->foto_bukti); ?>" target="_blank" class="btn btn-xs btn-outline-info mt-1">Lihat Bukti Foto Lama</a>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     
                 </div>
@@ -123,7 +129,7 @@ if (!function_exists('format_log_time')) {
 
                                 // Mencari Catatan
                                 preg_match("/Catatan: (.*?)(\sFoto Bukti:|$)/", $log->perubahan, $catatan_match);
-                                $log_catatan = $catatan_match[1] ?? null;
+                                $log_catatan = trim($catatan_match[1] ?? '');
 
                                 $log_time = format_log_time($log->timestamp);
                                 
@@ -140,6 +146,7 @@ if (!function_exists('format_log_time')) {
                                 // 2. Hapus teks "User [Nama] " dan path Foto Bukti dari deskripsi perubahan
                                 $perubahan_text_clean = str_replace('User ' . $log->user_pengubah_nama . ' ', '', $perubahan_log);
                                 if ($log_foto_path) {
+                                     // Hapus bagian Foto Bukti: ... dari string
                                      $perubahan_text_clean = preg_replace("/Foto Bukti: (.*?)(\s|$)/", '', $perubahan_text_clean);
                                 }
                                 
@@ -147,6 +154,7 @@ if (!function_exists('format_log_time')) {
                                 $normalized_path = '';
                                 if ($log_foto_path) {
                                     // Mengisolasi nama file dan merangkai ulang path agar 100% benar dengan base_url()
+                                    // Asumsi: path di DB adalah ./assets/uploads/bukti/...
                                     $file_name_only = basename($log_foto_path); 
                                     $normalized_path = 'assets/uploads/bukti/' . $file_name_only;
                                 }

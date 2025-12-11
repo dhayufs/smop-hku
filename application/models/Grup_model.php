@@ -118,10 +118,11 @@ class Grup_model extends CI_Model {
             $pj_user_id_final = NULL;
             $peran_id_final = NULL; 
             
-            if ($itemTemplate->tipe_item === 'checklist' && $itemTemplate->pj_peran_id != NULL) {
-                $peran_item = $itemTemplate->pj_peran_id;
-                $peran_id_final = $peran_item; 
-                $pj_user_id_final = isset($mapPenugasan[$peran_item]) ? $mapPenugasan[$peran_item] : NULL;
+            if ($itemTemplate->tipe_item === 'checklist') {
+                // Gunakan user default dari template item (Pelaksana)
+                $pj_user_id_final = $itemTemplate->pj_user_id_default; 
+                // Simpan PJ Peran dari Template jika ada
+                $peran_id_final = $itemTemplate->pj_peran_id; 
             }
 
             $item_inserts[] = [
@@ -133,7 +134,7 @@ class Grup_model extends CI_Model {
                 'hari_ke' => $itemTemplate->hari_ke,     
                 'tipe_item' => $itemTemplate->tipe_item,
                 'deskripsi' => $itemTemplate->deskripsi_item,
-                'peran_tugas_id' => $peran_id_final,
+                'peran_tugas_id' => $peran_id_final, 
                 'pj_user_id' => $pj_user_id_final,
                 'status' => 'Pending', 
                 'foto_bukti' => NULL,
@@ -161,6 +162,43 @@ class Grup_model extends CI_Model {
         $this->db->where('id', $id);
         return $this->db->update('tabel_grup', $data);
     }
+    
+    /**
+     * Memperbarui detail grup dan penugasan tim dalam satu transaksi
+     * @param int $grup_id ID Grup yang akan diperbarui
+     * @param array $grup_data_update Data untuk tabel_grup
+     * @param array $penugasan_tim_baru Map [peran_tugas_id] => user_id
+     * @return bool Status transaksi
+     */
+    public function update_grup_and_tim($grup_id, $grup_data_update, $penugasan_tim_baru)
+    {
+        $this->db->trans_start();
+
+        // 1. Update tabel_grup
+        $this->db->where('id', $grup_id);
+        $this->db->update('tabel_grup', $grup_data_update);
+
+        // 2. Update tabel_grup_tim (Hapus yang lama, masukkan yang baru)
+        $this->db->where('grup_id', $grup_id);
+        $this->db->delete('tabel_grup_tim');
+
+        $tim_inserts = [];
+        foreach ($penugasan_tim_baru as $peran_id => $user_id) {
+            $tim_inserts[] = [
+                'grup_id' => $grup_id,
+                'peran_tugas_id' => $peran_id,
+                'user_id' => $user_id
+            ];
+        }
+        if (!empty($tim_inserts)) {
+            $this->db->insert_batch('tabel_grup_tim', $tim_inserts);
+        }
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
+    }
+
 
     public function delete_grup($id)
     {
@@ -181,7 +219,6 @@ class Grup_model extends CI_Model {
     }
     
     // FUNGSI PENDUKUNG BARU (Revisi): Mengambil detail item untuk edit/validasi
-    // Catatan: Fungsi ini menggantikan implementasi sebelumnya di baris 102
     public function get_grup_item_detail($grup_item_id)
     {
         // Mengambil detail item checklist live (tabel_grup_item)
@@ -259,6 +296,41 @@ class Grup_model extends CI_Model {
         return $this->db->trans_status(); // Return status transaksi
     }
     
+    // --- FUNGSI BARU UNTUK TAMBAH ITEM LIVE DARI ADMIN ---
+
+    /**
+     * Mengambil urutan item terakhir dalam tanggal item tertentu di sebuah grup
+     */
+    public function get_last_urutan_grup($grup_id, $tanggal_item)
+    {
+        $this->db->select_max('urutan');
+        $this->db->where('grup_id', $grup_id);
+        $this->db->where('tanggal_item', $tanggal_item);
+        $query = $this->db->get('tabel_grup_item')->row();
+        
+        return $query->urutan ? $query->urutan + 1 : 1;
+    }
+
+    /**
+     * Membuat item live checklist baru
+     */
+    public function create_grup_item_live($data)
+    {
+        // Pastikan field status diset jika tidak ada (default Pending)
+        if (!isset($data['status'])) {
+            $data['status'] = 'Pending';
+        }
+        
+        // --- FIX for Error 1048/1452 ---
+        // Mengirim NULL adalah nilai logis yang benar untuk item manual.
+        // Asumsi: Developer TELAH MENGUBAH kolom 'template_item_asal_id' di tabel 'tabel_grup_item' menjadi NULLABLE.
+        if (!isset($data['template_item_asal_id']) || $data['template_item_asal_id'] === 0) {
+             $data['template_item_asal_id'] = NULL;
+        }
+        
+        return $this->db->insert('tabel_grup_item', $data);
+    }
+    
     // --- END FUNGSI BARU UNTUK EDIT CHECKLIST LIVE DARI ADMIN ---
     
     // FUNGSI YANG DIKEMBANGKAN (Point 3 & 4): Mengambil Checklist Live (dikelompokkan)
@@ -284,9 +356,10 @@ class Grup_model extends CI_Model {
     // FUNGSI ASLI (digunakan oleh Admin Controller)
     public function get_live_checklist($grup_id)
     {
-        $this->db->select('gi.*, u.nama_lengkap AS pj_nama');
+        $this->db->select('gi.*, u.nama_lengkap AS pj_nama, pt.nama_peran');
         $this->db->from('tabel_grup_item gi');
         $this->db->join('tabel_users u', 'u.id = gi.pj_user_id', 'left');
+        $this->db->join('tabel_peran_tugas pt', 'pt.id = gi.peran_tugas_id', 'left');
         $this->db->where('gi.grup_id', $grup_id);
         $this->db->order_by('gi.tanggal_item', 'ASC'); 
         $this->db->order_by('gi.urutan', 'ASC');

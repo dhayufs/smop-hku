@@ -15,6 +15,8 @@ if ($this->session->flashdata('error')) {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>';
 }
+
+$user_id = $this->session->userdata('user_id');
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -36,7 +38,7 @@ if ($this->session->flashdata('error')) {
                 <div class="row">
                     <div class="col-md-6 mb-3 mb-md-0">
                         <h6 class="text-dark fw-bold mb-3"><i class="bx bx-package me-1"></i> <?php echo $grup->nama_grup; ?></h6>
-                        <ul class="list-unstyled">
+                        <ul class="list-unstyled small">
                             <li class="mb-1"><span class="fw-semibold">Tgl. Mulai Manasik:</span> 
                                 <?php echo format_indo_date($grup->tanggal_mulai_manasik); ?>
                             </li>
@@ -51,7 +53,7 @@ if ($this->session->flashdata('error')) {
                     </div>
                     <div class="col-md-6 border-start">
                         <h6 class="fw-bold mb-3 text-secondary">Penanggung Jawab Tim:</h6>
-                        <ul class="list-group list-group-flush">
+                        <ul class="list-group list-group-flush small">
                             <?php if (!empty($penugasan)): ?>
                                 <?php foreach ($penugasan as $p): ?>
                                     <li class="list-group-item d-flex align-items-center p-1 ps-0">
@@ -144,35 +146,45 @@ if ($this->session->flashdata('error')) {
                                                     if ($item->status == 'Sukses') $status_color = 'success';
                                                     elseif ($item->status == 'Cukup') $status_color = 'warning';
                                                     elseif ($item->status == 'Buruk' || $item->status == 'Gagal') $status_color = 'danger';
+                                                    
+                                                    // Tentukan apakah ini tugas user saat ini
+                                                    $is_my_task = ($item->pj_user_id == $user_id);
+                                                    
+                                                    // Logika untuk menampilkan link Aksi
+                                                    $show_action_button = ($item->tipe_item == 'checklist' && $is_my_task && $item->status != 'Sukses');
 
-                                                    $li_class = $item->tipe_item == 'checklist' ? 'list-group-item list-group-item-action' : 'list-group-item bg-label-light';
+                                                    // Highlight tugas pengguna
+                                                    $li_class = $is_my_task ? 'list-group-item list-group-item-action bg-label-light' : 'list-group-item';
+                                                    $li_class .= ($item->tipe_item != 'checklist' ? ' bg-light text-muted' : '');
                                                     ?>
-                                                    <li class="<?php echo $li_class; ?> d-flex justify-content-between align-items-center py-2 px-3">
-                                                        <div class="me-auto d-flex flex-column"> 
+                                                    <li class="<?php echo $li_class; ?> d-flex justify-content-between align-items-center py-2 px-3 border-start-0 border-end-0">
+                                                        <div class="me-auto d-flex flex-column flex-grow-1"> 
                                                             
                                                             <div class="fw-bold d-flex align-items-center text-dark mb-1">
                                                                 <?php if ($item->tipe_item == 'checklist'): ?>
-                                                                    <i class="bx bx-check-square me-2 text-primary"></i>
+                                                                    <i class="bx bx-check-square me-2 <?php echo $is_my_task ? 'text-primary' : 'text-secondary'; ?>"></i>
+                                                                    <span class="<?php echo $is_my_task ? 'text-primary' : 'text-dark'; ?>">Tugas <?php echo $item->urutan; ?>:</span>
                                                                 <?php else: ?>
                                                                     <i class="bx bx-info-circle me-2 text-info"></i>
+                                                                    <span>Informasi <?php echo $item->urutan; ?>:</span>
                                                                 <?php endif; ?>
-                                                                <?php echo $item->deskripsi; ?>
-                                                                </div>
+                                                                <span class="ms-2"><?php echo $item->deskripsi; ?></span>
+                                                            </div>
                                                             
                                                             <?php if ($item->tipe_item == 'checklist'): ?>
-                                                                <div class="d-flex align-items-center ms-4 mb-1">
+                                                                <div class="d-flex align-items-center ms-4 mb-1 small">
                                                                     <span class="text-muted me-2">Status:</span>
                                                                     <span class="badge rounded-pill bg-<?php echo $status_color; ?>"><?php echo $item->status; ?></span>
                                                                 </div>
                                                                 
                                                                 <small class="text-muted ms-4 d-block">
-                                                                    PJ: <?php echo $item->pj_nama ? $item->pj_nama : 'Belum Ditugaskan'; ?> (<span class="fw-semibold"><?php echo $item->nama_peran; ?></span>)
+                                                                    Pelaksana: <span class="fw-semibold <?php echo $is_my_task ? 'text-success' : ''; ?>"><?php echo $item->pj_nama ? $item->pj_nama : 'Belum Ditugaskan'; ?></span>
                                                                 </small>
                                                             <?php endif; ?>
                                                             
                                                         </div>
                                                         
-                                                        <?php if ($item->tipe_item == 'checklist' && $item->status != 'Sukses'): ?>
+                                                        <?php if ($show_action_button): ?>
                                                             <a href="<?php echo site_url('mytasks/update_task_form/' . $item->id); ?>" 
                                                                class="btn btn-sm btn-primary align-self-center flex-shrink-0">
                                                                 <i class="bx bx-edit-alt me-1"></i> Aksi
