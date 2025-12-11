@@ -31,4 +31,29 @@ if ( ! function_exists('format_indo_date'))
     }
 }
 
-// Tambahkan fungsi helper lain jika diperlukan oleh Views atau Controller
+/**
+ * Helper untuk format Waktu Log KSA/WIB
+ * (Dipanggil di View update_task_form.php)
+ */
+if (!function_exists('format_log_time')) {
+    function format_log_time($timestamp) {
+        // Asumsi: Waktu di DB adalah WIB (Asia/Jakarta), karena server kemungkinan berada di Indonesia.
+        $dt_wib = new DateTime($timestamp, new DateTimeZone('Asia/Jakarta'));
+        
+        // Konversi ke KSA (Saudi Arabia Standard Time)
+        $dt_ksa = clone $dt_wib;
+        $dt_ksa->setTimezone(new DateTimeZone('Asia/Riyadh'));
+        
+        // Output format yang diminta
+        // Memanggil fungsi format_indo_date yang sudah didefinisikan di helper ini
+        $tanggal_indo = format_indo_date($dt_wib->format('Y-m-d'));
+        $wib_time = $dt_wib->format('H:i');
+        $ksa_time = $dt_ksa->format('H:i');
+        
+        return [
+            'tanggal' => $tanggal_indo,
+            'wib' => $wib_time,
+            'ksa' => $ksa_time
+        ];
+    }
+}

@@ -1,173 +1,213 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+// Helper function format_indo_date is assumed to be available globally now.
+
+// Cek apakah ada flashdata error atau success
+if ($this->session->flashdata('success')) {
+    echo '<div class="alert alert-success alert-dismissible" role="alert">
+            <i class="bx bx-check-circle me-2"></i>' . $this->session->flashdata('success') . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
+}
+if ($this->session->flashdata('error')) {
+    echo '<div class="alert alert-danger alert-dismissible" role="alert">
+            <i class="bx bx-error me-2"></i>' . $this->session->flashdata('error') . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
+}
+
 $user_id = $this->session->userdata('user_id');
-// Ambil tanggal target dari controller
-$tanggal_target = $tanggal_target ?? NULL; 
 ?>
 
-<h4 class="mb-4 font-bold text-gray-800 dark:text-gray-100">Detail Tugas Grup: <?php echo $grup->nama_grup; ?></h4>
-<p class="mb-4">
-    <a href="<?php echo site_url('mytasks'); ?>" class="btn btn-sm btn-secondary"><i class="fa fa-arrow-left"></i> Kembali ke Daftar Grup</a>
-</p>
-
-<?php if ($this->session->flashdata('success')): ?>
-    <div class="alert alert-success bg-green-100 text-green-800 p-3 rounded mb-4"><i class="fa fa-check-circle mr-2"></i> <?php echo $this->session->flashdata('success'); ?></div>
-<?php endif; ?>
-<?php if ($this->session->flashdata('error')): ?>
-    <div class="alert alert-danger bg-red-100 text-red-800 p-3 rounded mb-4"><i class="fa fa-times-circle mr-2"></i> <?php echo $this->session->flashdata('error'); ?></div>
-<?php endif; ?>
-
-<div class="card bg-white shadow-lg mb-4 p-4 border-l-4 border-primary">
-    <div class="row">
-        <div class="col-md-6">
-            <strong><i class="fa fa-tag mr-2"></i> Nama Program:</strong> <?php echo $grup->nama_grup; ?><br>
-            <strong><i class="fa fa-calendar-alt mr-2"></i> Tanggal Program:</strong> <?php echo format_indo_date($grup->tanggal_keberangkatan) . ' s/d ' . format_indo_date($grup->tanggal_pulang); ?>
-        </div>
-        <div class="col-md-6">
-            <?php foreach ($penugasan as $p): ?>
-                <?php
-                    $is_pic_class = ($p->user_id == $user_id) ? 'text-warning' : 'text-muted';
-                    $is_pic_icon = ($p->user_id == $user_id) ? '<i class="fa fa-star text-warning"></i>' : '';
-                ?>
-                <p class="mb-0 text-sm">
-                    <strong><?php echo $p->nama_peran; ?>:</strong> 
-                    <span class="<?php echo $is_pic_class; ?>"><?php echo $p->nama_lengkap; ?> <?php echo $is_pic_icon; ?></span>
-                </p>
-            <?php endforeach; ?>
-        </div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold py-3 mb-0">Detail Grup: <?php echo $grup->nama_grup; ?></h4>
+    <a href="<?php echo site_url('mytasks'); ?>" class="btn btn-primary">
+        <i class='bx bx-arrow-back me-1'></i> Kembali ke Daftar Grup
+    </a>
 </div>
 
-<div class="accordion" id="accordionGrupDetail">
-    <?php if (empty($grouped_items)): ?>
-        <div class="card text-center py-5 shadow-lg">
-            <div class="card-body">
-                <h5 class="card-title text-muted">Belum ada item tugas yang dicetak untuk grup ini.</h5>
+<div class="row">
+    
+    <div class="col-lg-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-label-info">
+                <h5 class="card-title mb-0 text-info"><i class="bx bx-info-circle me-1"></i> Informasi Grup & Penanggung Jawab</h5>
             </div>
-        </div>
-    <?php else: ?>
-
-        <?php $i = 0; foreach ($grouped_items as $tgl => $items_per_date): $i++; ?>
-            <?php
-                // Tentukan apakah sesi ini harus dibuka (show)
-                $is_show = ($tanggal_target === $tgl);
-                // Jika tidak ada target, buka sesi pertama saja
-                if ($tanggal_target === NULL && $i === 1) {
-                    $is_show = TRUE;
-                }
-            ?>
-            <div class="card mb-4 shadow-lg border-0">
-                <div class="card-header bg-light p-3 border-b border-gray-200 dark:border-gray-700" id="heading<?php echo $grup->id . $i; ?>">
-                    <h2 class="mb-0">
-                        <button class="btn btn-block text-left py-1 px-2 d-flex justify-content-between align-items-center font-weight-bold" type="button" data-toggle="collapse" data-target="#collapse<?php echo $grup->id . $i; ?>" aria-expanded="<?php echo $is_show ? 'true' : 'false'; ?>">
-                            Tugas Tanggal: <?php echo format_indo_date($tgl); ?>
-                            <i class="fa fa-chevron-down"></i>
-                        </button>
-                    </h2>
-                </div>
-
-                <div id="collapse<?php echo $grup->id . $i; ?>" class="collapse <?php echo $is_show ? 'show' : ''; ?>" aria-labelledby="heading<?php echo $grup->id . $i; ?>" data-parent="#accordionGrupDetail">
-                    <div class="card-body p-0">
-                        
-                        <?php foreach ($items_per_date as $blok => $items): ?>
-                        
-                        <h6 class="mt-3 mb-0 text-sm font-weight-bold bg-gray-100 p-2 text-primary">Sesi <?php echo ucfirst($blok); ?></h6>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-sm table-striped w-full mb-0">
-                                <thead class="bg-white text-black border-b border-gray-400">
-                                    <tr>
-                                        <th class="py-2 px-3 text-center" style="width: 5%">Kategori</th>
-                                        <th class="py-2 px-3">Tugas</th>
-                                        <th class="py-2 px-3 text-center" style="width: 15%">PIC</th>
-                                        <th class="py-2 px-3 text-center" style="width: 10%">Status</th>
-                                        <th class="py-2 px-3 text-center" style="width: 15%">Aksi / Bukti</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($items as $item): ?>
-                                        <?php
-                                            $status_class = ['Pending' => 'secondary', 'Sukses' => 'success', 'Cukup' => 'info', 'Buruk' => 'warning', 'Gagal' => 'danger'];
-                                            $status_label = ['Pending' => 'Pending', 'Sukses' => 'Sukses', 'Cukup' => 'Cukup', 'Buruk' => 'Buruk', 'Gagal' => 'Gagal'];
-                                            $is_my_task = ($item->pj_user_id == $user_id);
-                                            $is_checklist = ($item->tipe_item == 'checklist');
-                                            
-                                            // Tentukan PIC Label
-                                            $pic_label = $item->pj_nama ? $item->pj_nama : 'N/A';
-                                            $pic_star = ($item->pj_user_id == $user_id) ? ' <i class="fa fa-star text-warning"></i>' : '';
-                                            
-                                            // Mengganti **teks** menjadi <strong>teks</strong> pada deskripsi
-                                            $deskripsi_bold = str_replace(['**', '__'], ['<strong>', '</strong>'], $item->deskripsi);
-
-                                            // Tentukan Icon Kategori
-                                            $kategori_icon = ($item->tipe_item == 'checklist') ? '☑️' : '💡';
-                                        ?>
-                                        <tr>
-                                            <td class="text-center"><?php echo $kategori_icon; ?></td>
-                                            <td>
-                                                <?php echo $deskripsi_bold; ?>
-                                            </td>
-                                            <td class="text-center">
-                                                <?php if ($is_checklist): ?>
-                                                    <?php echo $pic_label . $pic_star; ?>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td class="text-center">
-                                                <?php if ($is_checklist): ?>
-                                                    <span class="badge badge-<?php echo $status_class[$item->status]; ?>">
-                                                        <?php echo $status_label[$item->status]; ?>
-                                                    </span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td class="text-center">
-                                                <?php if ($is_checklist): ?>
-                                                    <?php if ($is_my_task): ?>
-                                                        <a href="<?php echo site_url('mytasks/update_task_form/' . $item->id); ?>" class="btn btn-sm btn-primary py-1 px-2"><i class="fa fa-edit"></i> Aksi</a>
-                                                    <?php else: ?>
-                                                        <button class="btn btn-sm btn-secondary py-1 px-2 disabled" title="Hanya PIC yang terdaftar yang bisa edit">
-                                                            <i class="fa fa-lock"></i> Hanya PIC
-                                                        </button>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if ($item->foto_bukti): ?>
-                                                        <button type="button" class="btn btn-sm btn-success py-1 px-2 mt-1 mt-md-0"
-                                                                data-toggle="modal" 
-                                                                data-target="#buktiModal"
-                                                                data-foto-url="<?php echo base_url($item->foto_bukti); ?>">
-                                                            <i class="fa fa-camera"></i> Bukti
-                                                        </button>
-                                                    <?php endif; ?>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <?php endforeach; ?>
+            <br>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <h6 class="text-dark fw-bold mb-3"><i class="bx bx-package me-1"></i> <?php echo $grup->nama_grup; ?></h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-1"><span class="fw-semibold">Tgl. Mulai Manasik:</span> 
+                                <?php echo format_indo_date($grup->tanggal_mulai_manasik); ?>
+                            </li>
+                            <li class="mb-1"><span class="fw-semibold">Tgl. Keberangkatan:</span> 
+                                <?php echo format_indo_date($grup->tanggal_keberangkatan); ?>
+                            </li>
+                            <li class="mb-1"><span class="fw-semibold">Tgl. Pulang:</span> 
+                                <?php echo format_indo_date($grup->tanggal_pulang); ?>
+                            </li>
+                            <li class="mt-2"><span class="fw-semibold">Template Asal:</span> <span class="badge bg-label-secondary"><?php echo $grup->nama_template; ?></span></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6 border-start">
+                        <h6 class="fw-bold mb-3 text-secondary">Penanggung Jawab Tim:</h6>
+                        <ul class="list-group list-group-flush small">
+                            <?php if (!empty($penugasan)): ?>
+                                <?php foreach ($penugasan as $p): ?>
+                                    <li class="list-group-item d-flex align-items-center p-1 ps-0">
+                                        <i class="bx bx-user-circle me-2 text-primary"></i> 
+                                        <span class="text-muted" style="width: 40%;"><?php echo $p->nama_peran; ?>:</span> 
+                                        <strong class="text-dark"><?php echo $p->nama_lengkap; ?></strong>
+                                    </li>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <li class="text-muted">- Belum ada penugasan tim.</li>
+                            <?php endif; ?>
+                        </ul>
                     </div>
                 </div>
             </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
-
-<div class="modal fade" id="buktiModal" tabindex="-1" role="dialog" aria-labelledby="buktiModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header card-gradient-primary text-white border-0">
-        <h5 class="modal-title" id="buktiModalLabel">Foto Bukti Tugas</h5>
-        <button type="button" class="close text-white opacity-80" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body text-center">
-        <img id="modalFotoBukti" src="" class="img-fluid rounded shadow-sm" alt="Foto Bukti" style="max-height: 80vh;">
-      </div>
+        </div>
     </div>
-  </div>
-</div>
+    
+    <div class="col-lg-12">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bx bx-calendar-check me-2 text-primary"></i> Jadwal Tugas Harian</h5>
+            </div>
+            <div class="card-body">
+                
+                <?php 
+                $tanggal_sekarang = date('Y-m-d');
+                $target_date = $tanggal_target ?: $tanggal_sekarang;
+                ?>
 
-<script>
-    // Hanya untuk memastikan skrip bootstrap collapse bekerja
-</script>
+                <div class="accordion mt-2" id="taskAccordion">
+                    <?php if (!empty($grouped_items)): ?>
+                        <?php foreach ($grouped_items as $tanggal => $blocks): ?>
+                            <?php 
+                            $is_active = $tanggal == $target_date;
+                            $header_class = $is_active ? 'bg-primary' : 'bg-label-secondary'; 
+                            $title_date = format_indo_date($tanggal);
+                            
+                            $date_obj = new DateTime($tanggal);
+                            $is_past = $date_obj < new DateTime($tanggal_sekarang);
+                            $is_future = $date_obj > new DateTime($tanggal_sekarang);
+                            
+                            $status_info = '';
+                            if ($tanggal == $tanggal_sekarang) {
+                                $status_info = '<span class="badge bg-danger">HARI INI</span>';
+                            } elseif ($is_past) {
+                                $status_info = '<span class="badge bg-secondary">LEWAT</span>';
+                            } elseif ($is_future) {
+                                $status_info = '<span class="badge bg-info">AKAN DATANG</span>';
+                            }
+                            $text_class = $is_active ? 'text-white' : 'text-dark';
+                            ?>
+
+                            <div class="card mb-2 border">
+                                <div class="card-header <?php echo $header_class; ?> py-2" id="heading_<?php echo $tanggal; ?>">
+                                    <h7 class="mb-0">
+                                        <button class="btn btn-link <?php echo $text_class; ?> fw-bold w-100 text-start d-flex justify-content-between" 
+                                                type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#collapse_<?php echo $tanggal; ?>" 
+                                                aria-expanded="<?php echo $is_active ? 'true' : 'false'; ?>" 
+                                                aria-controls="collapse_<?php echo $tanggal; ?>">
+                                            
+                                            <div class="d-flex flex-column text-start">
+                                                <span class="d-block"><?php echo $title_date; ?></span>
+                                                <span class="d-block mt-1"><?php echo $status_info; ?></span>
+                                            </div>
+                                            
+                                            <i class="bx bx-chevron-down align-self-start ms-2"></i>
+                                        </button>
+                                    </h7>
+                                </div>
+
+                                <div id="collapse_<?php echo $tanggal; ?>" class="collapse <?php echo $is_active ? 'show' : ''; ?>" aria-labelledby="heading_<?php echo $tanggal; ?>" data-bs-parent="#taskAccordion">
+                                    <div class="card-body p-3">
+                                        <?php 
+                                        $block_order = ['manasik' => 'Manasik', 'perjalanan' => 'Perjalanan'];
+                                        foreach ($block_order as $block_key => $block_title):
+                                            if (isset($blocks[$block_key])):
+                                                $items = $blocks[$block_key];
+                                                $hari_ke = !empty($items) ? $items[0]->hari_ke : '';
+                                        ?>
+                                            <h6 class="mt-3 mb-2 text-decoration-underline text-secondary">
+                                                <i class="bx bx-calendar-check me-1"></i> <?php echo $block_title; ?> (Hari ke-<?php echo $hari_ke; ?>)
+                                            </h6>
+                                            <ul class="list-group list-group-flush mb-4 border rounded">
+                                                <?php foreach ($items as $item): ?>
+                                                    <?php
+                                                    $status_color = 'label-secondary';
+                                                    if ($item->status == 'Sukses') $status_color = 'success';
+                                                    elseif ($item->status == 'Cukup') $status_color = 'warning';
+                                                    elseif ($item->status == 'Buruk' || $item->status == 'Gagal') $status_color = 'danger';
+                                                    
+                                                    // Tentukan apakah ini tugas user saat ini
+                                                    $is_my_task = ($item->pj_user_id == $user_id);
+                                                    
+                                                    // Logika untuk menampilkan link Aksi
+                                                    $show_action_button = ($item->tipe_item == 'checklist' && $is_my_task && $item->status != 'Sukses');
+
+                                                    // Highlight tugas pengguna
+                                                    $li_class = $is_my_task ? 'list-group-item list-group-item-action bg-label-light' : 'list-group-item';
+                                                    $li_class .= ($item->tipe_item != 'checklist' ? ' bg-light text-muted' : '');
+                                                    ?>
+                                                    <li class="<?php echo $li_class; ?> d-flex justify-content-between align-items-center py-2 px-3 border-start-0 border-end-0">
+                                                        <div class="me-auto d-flex flex-column flex-grow-1"> 
+                                                            
+                                                            <div class="fw-bold d-flex align-items-center text-dark mb-1">
+                                                                <?php if ($item->tipe_item == 'checklist'): ?>
+                                                                    <i class="bx bx-check-square me-2 <?php echo $is_my_task ? 'text-primary' : 'text-secondary'; ?>"></i>
+                                                                    <span class="<?php echo $is_my_task ? 'text-primary' : 'text-dark'; ?>">Tugas <?php echo $item->urutan; ?>:</span>
+                                                                <?php else: ?>
+                                                                    <i class="bx bx-info-circle me-2 text-info"></i>
+                                                                    <span>Informasi <?php echo $item->urutan; ?>:</span>
+                                                                <?php endif; ?>
+                                                                <span class="ms-2"><?php echo $item->deskripsi; ?></span>
+                                                            </div>
+                                                            
+                                                            <?php if ($item->tipe_item == 'checklist'): ?>
+                                                                <div class="d-flex align-items-center ms-4 mb-1 small">
+                                                                    <span class="text-muted me-2">Status:</span>
+                                                                    <span class="badge rounded-pill bg-<?php echo $status_color; ?>"><?php echo $item->status; ?></span>
+                                                                </div>
+                                                                
+                                                                <small class="text-muted ms-4 d-block">
+                                                                    Pelaksana: <span class="fw-semibold <?php echo $is_my_task ? 'text-success' : ''; ?>"><?php echo $item->pj_nama ? $item->pj_nama : 'Belum Ditugaskan'; ?></span>
+                                                                </small>
+                                                            <?php endif; ?>
+                                                            
+                                                        </div>
+                                                        
+                                                        <?php if ($show_action_button): ?>
+                                                            <a href="<?php echo site_url('mytasks/update_task_form/' . $item->id); ?>" 
+                                                               class="btn btn-sm btn-primary align-self-center flex-shrink-0">
+                                                                <i class="bx bx-edit-alt me-1"></i> Aksi
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                        <?php 
+                                            endif; 
+                                        endforeach; 
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="alert alert-info"><i class="bx bx-info-circle me-1"></i> Tidak ada tugas yang tersedia untuk grup ini.</div>
+                    <?php endif; ?>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+</div>

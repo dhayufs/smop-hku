@@ -2,106 +2,124 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // === FUNGSI HELPER BARU UNTUK FORMAT TANGGAL INDONESIA (Hari, DD Bulan YYYY) ===
-if (!function_exists('format_indo_date')) {
-    function format_indo_date($date_string) {
-        // Daftar nama hari dan bulan dalam Bahasa Indonesia
-        $hari = array('Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu');
-        $bulan = array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember');
-        
-        // Konversi string tanggal ke timestamp
-        $date = strtotime($date_string);
-        // Ambil index hari (0=Minggu, 6=Sabtu)
-        $w = date('w', $date);
-        // Ambil tanggal
-        $tgl = date('d', $date);
-        // Ambil index bulan (1-12)
-        $bln = date('n', $date);
-        // Ambil tahun
-        $thn = date('Y', $date);
-        
-        // Gabungkan dan kembalikan format: Hari, DD Bulan YYYY
-        return $hari[$w] . ', ' . $tgl . ' ' . $bulan[$bln] . ' ' . $thn;
-    }
-}
+// (Fungsi dipindahkan ke controller MyTasks.php)
 // ==================================================================================
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-assets-path="<?php echo base_url('assets/sneat/');?>" data-template="vertical-menu-template-free">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title; ?> | SMOP</title>
     
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="<?php echo base_url('assets/sneat/vendor/fonts/boxicons.css'); ?>" />
+    <link rel="stylesheet" href="<?php echo base_url('assets/sneat/vendor/css/core.css'); ?>" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="<?php echo base_url('assets/sneat/vendor/css/theme-default.css'); ?>" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="<?php echo base_url('assets/sneat/css/demo.css'); ?>" />
+
+    <link rel="stylesheet" href="<?php echo base_url('assets/sneat/vendor/libs/perfect-scrollbar/perfect-scrollbar.css'); ?>" />
     
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-    
+    <script src="<?php echo base_url('assets/sneat/vendor/js/helpers.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/sneat/js/config.js'); ?>"></script>
+
     <style>
-        body {
-            background-color: #f0f2f5;
-        }
-        
-        /* === Gaya Card Utama === */
-        .order-card {
-            color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease-in-out;
-            cursor: default;
-        }
-        .order-card:hover {
-             box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
-        }
-        
-        /* Flexbox untuk konten card */
-        .card-block {
-            padding: 1.25rem;
-        }
-        .m-b-20 {
-            margin-bottom: 20px;
-        }
-        .f-left {
-            float: left;
-        }
-        .f-right {
-            float: right;
-        }
-        
-        /* === Definisi Gradient Color === */
-        .bg-c-blue {
-            background: linear-gradient(45deg,#4099ff,#73b4ff); /* Biru (Pending) */
-        }
-        
-        .bg-c-green {
-            background: linear-gradient(45deg,#2ed8b6,#59e0c5); /* Hijau (Sukses) */
-        }
-        
-        .bg-c-yellow {
-            background: linear-gradient(45deg,#FFB64D,#ffcb80); /* Kuning (Cukup) */
-        }
-        
-        .bg-c-pink {
-            background: linear-gradient(45deg,#FF5370,#ff869a); /* Merah Muda (Buruk/Gagal) */
-        }
-        
-        /* === Gaya untuk Daftar Tugas (Header Grup) === */
-        .card-gradient-primary {
-            background: linear-gradient(45deg,#4099ff,#73b4ff); 
-            color: white;
-            border-radius: 0.25rem;
-        }
+        /* CSS lama telah dihapus untuk mengutamakan gaya dari template Sneat */
     </style>
+
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-primary shadow-sm">
-        <a class="navbar-brand" href="<?php echo site_url('mytasks'); ?>">SMOP</a>
-        <span class="navbar-text">
-            Halo, <?php echo $this->session->userdata('nama_lengkap'); ?> | 
-            <a href="<?php echo site_url('auth/logout'); ?>" class="text-white font-weight-bold">
-                <i class="fa fa-sign-out-alt"></i> Logout
-            </a>
-        </span>
-    </nav>
-    <div class="container py-4">
+    <div class="layout-wrapper layout-content-navbar">
+        <div class="layout-container">
+
+            <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+                <div class="app-brand demo">
+                    <a href="<?php echo site_url('mytasks'); ?>" class="app-brand-link">
+                        <span class="app-brand-logo demo">
+                            <img src="https://haramaintour.com/wp-content/uploads/2025/06/logo-haramainku-haramaintour-kartika-utama.jpg" alt="Logo" style="max-height: 45px;">
+                        </span>
+                    </a>
+
+                    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+                        <i class="bx bx-chevron-left bx-sm align-middle"></i>
+                    </a>
+                </div>
+
+                <div class="menu-inner-shadow"></div>
+                
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">Tugas Lapangan</span></li>
+
+                <ul class="menu-inner py-1">
+                    <li class="menu-item <?php echo (uri_string() == 'mytasks' || strpos(uri_string(), 'mytasks/grup_detail') !== FALSE || strpos(uri_string(), 'mytasks/update_task_form') !== FALSE) ? 'active open' : ''; ?>">
+                        <a href="<?php echo site_url('mytasks'); ?>" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-list-check"></i>
+                            <div data-i18n="My Tasks">List Tugas</div>
+                        </a>
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="<?php echo site_url('auth/logout'); ?>" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-log-out"></i>
+                            <div data-i18n="Logout">Logout</div>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+            <div class="layout-page">
+                <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+                    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                            <i class="bx bx-menu bx-sm"></i>
+                        </a>
+                    </div>
+
+                    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+                        <div class="navbar-nav align-items-center">
+                            <div class="nav-item d-flex align-items-center">
+                                <h5 class="mb-0 fw-bold">Sistem Monitoring Oprasional</h5>
+                            </div>
+                        </div>
+                        
+                        <ul class="navbar-nav flex-row align-items-center ms-auto">
+                            <li class="nav-item navbar-dropdown dropdown dropdown-user">
+                                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                                    <div class="avatar avatar-online">
+                                        <img src="<?php echo base_url('assets/sneat/img/avatars/1.png'); ?>" alt class="w-px-40 h-auto rounded-circle" />
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="javascript:void(0);">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="avatar avatar-online">
+                                                        <img src="<?php echo base_url('assets/sneat/img/avatars/1.png'); ?>" alt class="w-px-40 h-auto rounded-circle" />
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <span class="fw-semibold d-block"><?php echo $this->session->userdata('nama_lengkap'); ?></span>
+                                                    <small class="text-muted"><?php echo ucfirst($this->session->userdata('system_role')); ?></small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <div class="dropdown-divider"></div>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="<?php echo site_url('auth/logout'); ?>">
+                                            <i class="bx bx-power-off me-2"></i>
+                                            <span class="align-middle">Log Out</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            </ul>
+                    </div>
+                </nav>
+                <div class="content-wrapper">
+
+                    <div class="container-xxl flex-grow-1 container-p-y">
