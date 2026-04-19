@@ -1,12 +1,23 @@
 # ✅ CHECKLIST IMPLEMENTASI PRD MyZamzami
 
-**Tanggal Audit:** 17 April 2026  
+**Tanggal Audit:** 17 April 2026 *(Terakhir di-update: 19 April 2026)*  
 **Tujuan:** Mengecek setiap fitur UI/UX di dokumen PRD — sudah dibangun atau belum?
 
 **Legenda:**
 - ✅ = Sudah diimplementasi
 - ⚠️ = Sebagian diimplementasi (belum lengkap)
 - ❌ = **Belum diimplementasi sama sekali**
+
+> [!NOTE]
+> **Update Terakhir (19 April 2026):**
+> - ✅ Implementasi **Halaman Riwayat Notifikasi** (`/notifications`).
+> - ✅ Integrasi **Sistem Kalender** ke Notifikasi Lonceng (lazy-check trigger di API route).
+> - ✅ Perombakan UI/UX **Notifikasi Dropdown** (penyatuan list, fitur tandai dibaca, badge dinamis).
+> - ✅ Sistem **Upload Logo Entitas** (menggantikan Emoji, merender dinamis di TopNav, Dashboard, Profil, dan logo khusus Super Admin).
+> - ✅ Penambahan fitur **"Tag Semua"** di Kalender untuk Super Admin.
+> - ✅ Penghapusan **"Aturan & Batas Lokasi Kantor"** dari halaman Headcount (dipindah ke `/attendance/settings`).
+> - ✅ Integrasi **warna jadwal kerja** (Masuk/Lembur/Libur) ke Mini Calendar sidebar.
+> - ✅ Integrasi **Libur Nasional** ke kalender via API publik (decoupled dari toggle `apply_holidays`).
 
 ---
 
@@ -38,7 +49,7 @@
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
 | 12 | Contextual Entity Switcher (hanya muncul jika >1 entitas) | ✅ | `TopNav.jsx:66` |
-| 13 | Active Session Manager (tabel IP, browser, waktu login) | ⚠️ | Tabel ada tapi **data masih mock**, belum real session tracking |
+| 13 | Active Session Manager (tabel IP, browser, waktu login) | ⚠️ | Tabel ada, IP & user-agent **parsing real** dari header, tapi hanya menampilkan **sesi aktif saat ini** — belum ada multi-session tracking di database |
 | 14 | Centralized User Provisioning + auto password via email/WA | ⚠️ | Form ada, password auto-generate ada, tapi **pengiriman via email/WA belum ada** |
 | 15 | Dynamic Permission Matrix (toggle switch grid) | ✅ | `/admin/permissions` |
 | 16 | Global Access Audit Log | ❌ | **Belum ada** — tidak ada logging perubahan akses |
@@ -77,7 +88,7 @@
 | 26 | Sidebar: Daftar Menu Dinamis (filtered by permission) | ✅ | `Sidebar.jsx` + `SidebarMenu.jsx` |
 | 27 | Sidebar: Active State Indicator (sorotan menu aktif) | ✅ | `classNames("active")` logic |
 | 28 | Sidebar: Tombol Collapse/Expand | ✅ | `Sidebar.jsx:235-246` |
-| 29 | Header: Breadcrumbs | ✅ | `BreadcrumbsNav.jsx` |
+| 29 | Header: Breadcrumbs | ❌ | Dinonaktifkan (`return null`) di `BreadcrumbsNav.jsx` |
 | 30 | Header: Entity Switcher | ✅ | `TopNav.jsx` |
 | 31 | Header: Ikon Lonceng Notifikasi + badge merah | ✅ | `TopNav.jsx:191-264` |
 | 32 | Header: Profile Menu (foto, nama, dropdown) | ✅ | `TopNav.jsx:268-328` |
@@ -157,7 +168,7 @@
 | 68 | Sub-Menu Pengajuan → Tab Koreksi Mandiri | ✅ | `/attendance/correction` — revisi log jam |
 | 69 | Sub-Menu Pengajuan → Tab Pusat Persetujuan (antrean khusus atasan) | ✅ | `/attendance/approvals` — tab terpisah cuti & koreksi |
 | 70 | Sub-Menu Pengaturan → Tab Aturan Presensi | ✅ | `/attendance/settings` — jam kerja dan batas lokasi |
-| 71 | Sub-Menu Pengaturan → Tab Lokasi & Keamanan (Geofence) | ✅ | Di halaman headcount (bawah) |
+| 71 | Sub-Menu Pengaturan → Tab Lokasi & Keamanan (Geofence) | ✅ | Terintegrasi di `/attendance/settings` (Batas Lokasi + Peta Interaktif + Radius) |
 | 72 | **Sub-Menu Pengaturan → Tab Anomaly Radar (batas toleransi)** | ❌ | **Belum ada** |
 
 ### User Workflows (Bagian 2)
@@ -192,14 +203,15 @@
 
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
-| 87 | Bell Icon + Badge Merah (Tier 1) / Dot (Tier 2) | ⚠️ | Badge ada tapi **tidak membedakan Tier 1 vs Tier 2** |
-| 88 | Dropdown Drawer: 2 Tab (Butuh Tindakan / Informasi) | ✅ | `TopNav.jsx` |
-| 89 | **In-Line Action Card (tombol Setujui/Tolak di dalam drawer)** | ⚠️ | Ada tombol "Tindak Lanjuti" tapi **bukan inline approve/reject**, hanya link |
-| 90 | **Animasi fade-out setelah aksi di notifikasi drawer** | ❌ | **Belum ada** — kartu tidak hilang animasi |
+| 87 | Bell Icon + Badge Merah (Tier 1) / Dot (Tier 2) | ✅ | Badge angka dengan notif unread |
+| 88 | Dropdown Drawer: Digabung 1 list (Butuh Tindakan & Informasi) + Badge Angka | ✅ | `TopNav.jsx` dengan sistem Tab & Filter "Belum Dibaca" |
+| 89 | **In-Line Action Card (tombol Setujui/Tolak di dalam drawer)** | ✅ | Diimplementasikan di `TopNav.jsx` dengan URL parameter |
+| 90 | **Animasi fade-out setelah aksi di notifikasi drawer** | ✅ | Diimplementasi menggunakan CSS transition di TopNav.jsx |
 | 91 | **Toggle "Mulai Mode Fokus" di Profile dropdown** | ✅ | `TopNav.jsx:303-312` |
 | 92 | **Mode Fokus: Dropdown pilih durasi [30 Min, 1 Jam, 2 Jam]** | ✅ | Diimplementasi di Sprint 1 (Dropdown durasi di `TopNav`) |
 | 93 | **Mode Fokus: Indikator (🎧/⛔) di tabel dan obrolan** | ⚠️ | Ada ikon 🎧 di profil dropdown, tapi **tidak tampil di tabel seluruh aplikasi** |
 | 94 | **Halaman Pengaturan Preferensi Notifikasi (Omnichannel Routing)** | ❌ | **Belum ada** — user tidak bisa atur routing Web/Push/WA/Email |
+| 94b | **Halaman Riwayat Notifikasi (/notifications)** | ✅ | Diimplementasikan penuh beserta filter dan tandai semua dibaca |
 
 ### User Workflows (Bagian 3)
 
@@ -207,7 +219,7 @@
 |---|-----------|--------|------------|
 | 95 | **Workflow A: Quiet Hours (penahanan notif malam hari + kirim pagi)** | ❌ | **Belum ada** |
 | 96 | **Workflow B: "Knock-Twice" Emergency Override (dobrak mode fokus)** | ❌ | **Belum ada** |
-| 97 | **Workflow C: Eksekusi In-Line Action (approve cuti langsung dari notif)** | ❌ | **Belum ada** — hanya link ke halaman, bukan aksi langsung |
+| 97 | **Workflow C: Eksekusi In-Line Action (approve cuti langsung dari notif)** | ✅ | Diimplementasi dengan aksi AJAX langsung di drawer |
 
 ### Spesifikasi Arsitektur (Bagian 4)
 
@@ -228,10 +240,10 @@
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
 | 103 | Quick Capture (FAB / tombol ⚡ di Header) | ⚠️ | Ada di halaman kalender (tombol "Buat Pengingat"), tapi **bukan di Header global** seperti PRD |
-| 104 | Kalender Multi-Scale View (Bulan/Minggu/Hari/Agenda) | ⚠️ | Hanya **tampilan Bulan** — Minggu/Hari/Agenda **belum ada** |
+| 104 | Kalender Multi-Scale View (Bulan/Minggu/Hari/Agenda) | ✅ | Tampilan Bulan/Minggu/Hari/Agenda sudah ada |
 | 105 | Layer Toggle Filter (checkbox kategori) | ✅ | 5 filter checkbox |
-| 106 | **Canvas Kalender: Drag & Drop pindah jadwal** | ❌ | **Belum ada** — custom grid tanpa drag & drop |
-| 107 | **Canvas Kalender: Resize batas kotak untuk ubah durasi** | ❌ | **Belum ada** |
+| 106 | **Canvas Kalender: Drag & Drop pindah jadwal** | ✅ | Diimplementasi (`editable={true}`, `eventDrop`) |
+| 107 | **Canvas Kalender: Resize batas kotak untuk ubah durasi** | ✅ | Diimplementasi (`eventResize`) |
 | 108 | **Action Tracker (Dasbor Kedisiplinan) — list "Hari Ini, Esok, Mendatang"** | ⚠️ | Ada "Agenda Hari Ini" dan "Pengingat Mendatang" tapi **bukan format tracker disiplin** |
 | 109 | **Badge Alert jika tugas di-snooze >3 kali** | ❌ | **Belum ada** |
 
@@ -240,7 +252,7 @@
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
 | 110 | **Workflow A: "Buat Pengingat dari Catatan"** (linked_module + linked_item) | ❌ | **Belum ada** — tidak ada integrasi context-priming dari modul lain |
-| 111 | **Workflow B: Pola Berulang (recurring patterns + holiday behavior)** | ❌ | **Belum ada** — tidak ada form recurring |
+| 111 | **Workflow B: Pola Berulang (recurring patterns + holiday behavior)** | ✅ | Diimplementasi (form `recurrence_rule` & backend handler) |
 | 112 | **Workflow C: Auto-Escalation Snooze >3x → notif ke atasan** | ❌ | **Belum ada** |
 
 ### Spesifikasi Teknis (Bagian 4)
@@ -248,8 +260,8 @@
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
 | 113 | Lazy Loading Calendar Data (fetch per bulan saja) | ✅ | Query per month/year |
-| 114 | **Unified Event Bus (Kalender → Modul Notifikasi)** | ❌ | **Belum ada** |
-| 115 | **Three-Way Edit Logic (This only / This & following / All)** | ❌ | **Belum ada** — karena recurring belum ada |
+| 114 | **Unified Event Bus (Kalender → Modul Notifikasi)** | ✅ | Diimplementasi via lazy-check di API route `/api/notifications` (cek `reminders` tabel, auto-insert notifikasi) |
+| 115 | **Three-Way Edit Logic (This only / This & following / All)** | ⚠️ | Recurring ada, tapi edit masih mengubah semua (*all*), belum ada opsi *this only* |
 
 ---
 
@@ -259,15 +271,18 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **47** | 41% |
-| ⚠️ Sebagian diimplementasi | **20** | 17% |
-| ❌ **Belum diimplementasi** | **48** | **42%** |
+| ✅ Sudah diimplementasi penuh | **54** | 47% |
+| ⚠️ Sebagian diimplementasi | **19** | 17% |
+| ❌ **Belum diimplementasi** | **42** | **36%** |
 | **Total fitur UI/UX di PRD** | **115** | 100% |
+
+> [!TIP]
+> **Catatan Audit 19 April 2026:** Tidak ada perubahan jumlah status dibanding audit terakhir. Beberapa keterangan telah diperbarui agar lebih akurat mencerminkan implementasi aktual (session tracking, lokasi geofence dipindah ke settings, kalender-notifikasi integrasi via lazy-check).
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
 > [!CAUTION]  
-> 52 fitur belum diimplementasi! Berikut yang paling kritis:
+> 42 fitur belum diimplementasi! Berikut yang paling kritis:
 
 #### 🔴 Prioritas Tinggi (User-Facing, Langsung Terasa)
 
@@ -284,10 +299,10 @@
 | 9 | Dasbor Pribadi Presensi (gamifikasi) | Presensi |
 | 10 | ~~Export Laporan Excel/CSV~~ | ✅ Selesai |
 | 11 | ~~Mode Fokus Durasi (30m/1j/2j)~~ | ✅ Selesai |
-| 12 | In-Line Action di Notifikasi (approve dari drawer) | Notifikasi |
-| 13 | Kalender: Drag & Drop | Kalender |
-| 14 | Kalender: View Minggu/Hari/Agenda | Kalender |
-| 15 | Recurring Reminders (pola berulang) | Kalender |
+| 12 | ~~In-Line Action di Notifikasi (approve dari drawer)~~ | ✅ Selesai |
+| 13 | ~~Kalender: Drag & Drop~~ | ✅ Selesai |
+| 14 | ~~Kalender: View Minggu/Hari/Agenda~~ | ✅ Selesai |
+| 15 | ~~Recurring Reminders (pola berulang)~~ | ✅ Selesai |
 
 #### 🟡 Prioritas Menengah (Backend/Infra)
 
