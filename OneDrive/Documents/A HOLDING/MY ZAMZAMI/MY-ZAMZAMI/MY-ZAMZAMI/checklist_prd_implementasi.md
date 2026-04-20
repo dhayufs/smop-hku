@@ -174,7 +174,7 @@
 | 74 | Workflow A: Geofence spesifik per entitas | ✅ | Settings per entity |
 | 75 | Workflow A: **Offline Mode Sync** | ✅ | Implemented via IndexedDB and Service Worker |
 | 76 | Workflow B: Approval Berjenjang (Atasan → HRD) | ⚠️ | Approval ada tapi **berjenjang (2 step) belum ada**, langsung 1 step |
-| 77 | **Workflow B: Forward notifikasi otomatis ke atasan setelah cuti diajukan** | ❌ | **Belum ada** — notifikasi approval otomatis belum terkoneksi |
+| 77 | **Workflow B: Forward notifikasi otomatis ke atasan setelah cuti diajukan** | ✅ | Notifikasi approval (action type) di-broadcast ke Entity Admins (pengganti Atasan spesifik) |
 
 ### Spesifikasi Teknis (Bagian 3)
 
@@ -182,8 +182,8 @@
 |---|-----------|--------|------------|
 | 78 | Dynamic Geofencing per entity_id | ✅ | Implemented |
 | 79 | Selfie Verification WFH (real-time, bukan dari galeri) | ✅ | Camera API |
-| 80 | **Cuti Bersama Massal (Global Admin potong semua entitas)** | ❌ | **Belum ada** |
-| 81 | **Libur Khusus Entitas (Entity Admin potong hanya entitasnya)** | ❌ | **Belum ada** |
+| 80 | **Cuti Bersama Massal (Global Admin potong semua entitas)** | ✅ | Diimplementasi di tabel `master_holidays` via pengaturan presensi |
+| 81 | **Libur Khusus Entitas (Entity Admin potong hanya entitasnya)** | ✅ | Sama dengan atas, scope `entity` |
 | 82 | Export Laporan Excel/CSV | ✅ | Diimplementasi di halaman Rekapitulasi Induk |
 | 83 | **Anomaly Radar Notifikasi ("Staf X absen 3 hari berturut")** | ❌ | **Belum ada** |
 | 84 | **Aggregated Live Headcount (drill-down per entitas)** | ⚠️ | Donut chart ada tapi **drill-down klik per entitas belum ada** |
@@ -266,9 +266,9 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **62** | 54% |
+| ✅ Sudah diimplementasi penuh | **65** | 57% |
 | ⚠️ Sebagian diimplementasi | **19** | 16% |
-| ❌ **Belum diimplementasi** | **34** | **30%** |
+| ❌ **Belum diimplementasi** | **31** | **27%** |
 | **Total fitur UI/UX di PRD** | **115** | 100% |
 
 > [!TIP]
@@ -277,7 +277,7 @@
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
 > [!CAUTION]  
-> 34 fitur belum diimplementasi! Berikut yang paling kritis:
+> 31 fitur belum diimplementasi! Berikut yang paling kritis:
 
 #### 🔴 Prioritas Tinggi (User-Facing, Langsung Terasa)
 
