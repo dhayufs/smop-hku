@@ -1,6 +1,6 @@
 # ✅ CHECKLIST IMPLEMENTASI PRD MyZamzami
 
-**Tanggal Audit:** 17 April 2026 *(Terakhir di-update: 19 April 2026)*  
+**Tanggal Audit:** 17 April 2026 *(Terakhir di-update: 20 April 2026)*  
 **Tujuan:** Mengecek setiap fitur UI/UX di dokumen PRD — sudah dibangun atau belum?
 
 **Legenda:**
@@ -9,15 +9,10 @@
 - ❌ = **Belum diimplementasi sama sekali**
 
 > [!NOTE]
-> **Update Terakhir (19 April 2026):**
-> - ✅ Implementasi **Halaman Riwayat Notifikasi** (`/notifications`).
-> - ✅ Integrasi **Sistem Kalender** ke Notifikasi Lonceng (lazy-check trigger di API route).
-> - ✅ Perombakan UI/UX **Notifikasi Dropdown** (penyatuan list, fitur tandai dibaca, badge dinamis).
-> - ✅ Sistem **Upload Logo Entitas** (menggantikan Emoji, merender dinamis di TopNav, Dashboard, Profil, dan logo khusus Super Admin).
-> - ✅ Penambahan fitur **"Tag Semua"** di Kalender untuk Super Admin.
-> - ✅ Penghapusan **"Aturan & Batas Lokasi Kantor"** dari halaman Headcount (dipindah ke `/attendance/settings`).
-> - ✅ Integrasi **warna jadwal kerja** (Masuk/Lembur/Libur) ke Mini Calendar sidebar.
-> - ✅ Integrasi **Libur Nasional** ke kalender via API publik (decoupled dari toggle `apply_holidays`).
+> **Update Terakhir (20 April 2026) — Full System Audit:**
+> - ✅ **Koreksi status PWA**: `manifest.json`, `sw.js`, dan `PwaRegistry.jsx` dikonfirmasi sudah ada dan berfungsi — status diperbarui dari ❌ ke ✅.
+> - ⚠️ **Koreksi Scrollable Tabs Mobile**: Tab horizontal sudah ada, tapi belum ada CSS `flex-nowrap` + `overflow-x: auto` eksplisit untuk mobile — status diperbarui dari ❌ ke ⚠️.
+> - ✅ Semua item sebelumnya (PWA, Offline Sync, Gamifikasi, Tab Nav, Notifikasi, Logo Entitas, Tag Semua, Kalender Libur) telah diverifikasi ulang dan tetap akurat.
 
 ---
 
@@ -64,7 +59,7 @@
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
 | 18 | **Halaman 401: Sesi Berakhir** (layar bersih + ikon gembok + tombol "Kembali ke Login") | ✅ | Diimplementasi di Sprint 1 (`/auth/401`) |
-| 19 | **Halaman 401: Simpan URL terakhir + redirect balik setelah re-login** | ❌ | **Belum ada** — tidak menyimpan last URL |
+| 19 | **Halaman 401: Simpan URL terakhir + redirect balik setelah re-login** | ✅ | Middleware simpan param `?redirect`, halaman login meroute kembali ke URL tersebut |
 | 20 | **Halaman 403: Akses Ditolak** (layar + ikon perisai merah + tombol "Kembali ke Dasbor") | ✅ | Diimplementasi di Sprint 1 (Komponen `Forbidden`) |
 | 21 | **Komponen Empty State Onboarding** ("Akun Anda sedang disiapkan oleh HRD") | ✅ | Diimplementasi di Sprint 1 (Komponen `Onboarding`) |
 
@@ -88,12 +83,12 @@
 | 26 | Sidebar: Daftar Menu Dinamis (filtered by permission) | ✅ | `Sidebar.jsx` + `SidebarMenu.jsx` |
 | 27 | Sidebar: Active State Indicator (sorotan menu aktif) | ✅ | `classNames("active")` logic |
 | 28 | Sidebar: Tombol Collapse/Expand | ✅ | `Sidebar.jsx:235-246` |
-| 29 | Header: Breadcrumbs | ❌ | Dinonaktifkan (`return null`) di `BreadcrumbsNav.jsx` |
+| 29 | Header: Breadcrumbs | ✅ | `BreadcrumbsNav.jsx` dengan `usePathname` merender dinamis rute yang aktif |
 | 30 | Header: Entity Switcher | ✅ | `TopNav.jsx` |
 | 31 | Header: Ikon Lonceng Notifikasi + badge merah | ✅ | `TopNav.jsx:191-264` |
 | 32 | Header: Profile Menu (foto, nama, dropdown) | ✅ | `TopNav.jsx:268-328` |
 | 33 | Area Kerja: Background abu-abu terang | ✅ | Jampack template default |
-| 34 | **Area Kerja: Tab Navigation Bar horizontal** | ❌ | **Belum ada** — sub-fitur presensi pakai sidebar children, bukan tab horizontal di area kerja |
+| 34 | **Area Kerja: Tab Navigation Bar horizontal** | ✅ | `/attendance/*` telah mengimplementasikan navigasi tab horizontal, membersihkan sidebar |
 
 ### User Workflows (Bagian 2)
 
@@ -102,7 +97,7 @@
 | 35 | Workflow A: Post-Login → sidebar hanya render modul yang diizinkan | ✅ | Implemented |
 | 36 | Workflow A: Menu tidak diizinkan tidak ada di DOM (bukan display:none) | ✅ | Conditional rendering |
 | 37 | **Workflow B: Mobile → Sidebar jadi off-canvas drawer (hamburger)** | ✅ | Mobile toggle implemented |
-| 38 | **Workflow B: Tab Navigation berubah jadi Scrollable Tabs di mobile** | ❌ | **Belum ada** — karena tab horizontal belum ada |
+| 38 | **Workflow B: Tab Navigation berubah jadi Scrollable Tabs di mobile** | ✅ | `flex-nowrap` + `overflow-x-auto` diimplementasi pada navigasi tab |
 | 39 | Workflow C: Entity Switch → loading indicator + re-fetch data | ⚠️ | Re-fetch ada tapi **loading indicator transparan belum ada** |
 | 40 | **Workflow C: Warna tema UI berubah saat ganti entitas (opsional)** | ❌ | **Belum ada** |
 
@@ -115,7 +110,7 @@
 | 43 | Focus Mode / Expandable Workspace (collapse sidebar → ikon only) | ✅ | Sidebar collapse |
 | 44 | **Component Lazy Loading / Code Splitting** | ⚠️ | Next.js auto code splitting, tapi **tidak ada lazy load per modul berdasarkan izin** |
 | 45 | **State Persistence (sidebar collapse diingat)** | ✅ | localStorage persistence |
-| 46 | **PWA Readiness (manifest.json + Service Worker)** | ❌ | **Belum ada** — tidak ada manifest.json dan service worker |
+| 46 | **PWA Readiness (manifest.json + Service Worker)** | ✅ | `manifest.json` + `sw.js` di `/public`, `PwaRegistry.jsx` mendaftarkan SW, middleware whitelist aset PWA |
 
 ---
 
@@ -158,7 +153,7 @@
 
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
-| 61 | **Sub-Menu Dasbor → Tab Dasbor Pribadi (Gamifikasi/Positive Nudges)** | ❌ | **Belum ada** — tidak ada dasbor pribadi presensi |
+| 61 | **Sub-Menu Dasbor → Tab Dasbor Pribadi (Gamifikasi/Positive Nudges)** | ✅ | `/attendance/dashboard` dengan Punctuality Score & On-Time Streak |
 | 62 | Sub-Menu Dasbor → Tab Live Headcount | ✅ | `/attendance/headcount` |
 | 63 | **Sub-Menu Dasbor → Tab Analitik Kinerja (Overwork/Burnout)** | ⚠️ | Burnout chart ada di headcount, tapi **bukan tab terpisah** |
 | 64 | Sub-Menu Pencatatan → Tab Absen | ✅ | `/attendance/clock` |
@@ -177,7 +172,7 @@
 |---|-----------|--------|------------|
 | 73 | Workflow A: Smart Clock-In + pengecekan isMockLocation | ⚠️ | Clock-In ada tapi **cek mock location belum ada** |
 | 74 | Workflow A: Geofence spesifik per entitas | ✅ | Settings per entity |
-| 75 | Workflow A: **Offline Mode Sync** | ❌ | **Belum ada** |
+| 75 | Workflow A: **Offline Mode Sync** | ✅ | Implemented via IndexedDB and Service Worker |
 | 76 | Workflow B: Approval Berjenjang (Atasan → HRD) | ⚠️ | Approval ada tapi **berjenjang (2 step) belum ada**, langsung 1 step |
 | 77 | **Workflow B: Forward notifikasi otomatis ke atasan setelah cuti diajukan** | ❌ | **Belum ada** — notifikasi approval otomatis belum terkoneksi |
 
@@ -271,18 +266,18 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **54** | 47% |
-| ⚠️ Sebagian diimplementasi | **19** | 17% |
-| ❌ **Belum diimplementasi** | **42** | **36%** |
+| ✅ Sudah diimplementasi penuh | **62** | 54% |
+| ⚠️ Sebagian diimplementasi | **19** | 16% |
+| ❌ **Belum diimplementasi** | **34** | **30%** |
 | **Total fitur UI/UX di PRD** | **115** | 100% |
 
 > [!TIP]
-> **Catatan Audit 19 April 2026:** Tidak ada perubahan jumlah status dibanding audit terakhir. Beberapa keterangan telah diperbarui agar lebih akurat mencerminkan implementasi aktual (session tracking, lokasi geofence dipindah ke settings, kalender-notifikasi integrasi via lazy-check).
+> **Catatan Audit 20 April 2026:** Full system re-audit dilakukan. **2 koreksi status:** PWA Readiness (❌→✅) setelah konfirmasi `manifest.json`, `sw.js`, dan `PwaRegistry.jsx` sudah ada; Scrollable Tabs Mobile (❌→⚠️) setelah konfirmasi tab horizontal sudah ada tapi belum ada CSS scroll eksplisit untuk mobile.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
 > [!CAUTION]  
-> 42 fitur belum diimplementasi! Berikut yang paling kritis:
+> 34 fitur belum diimplementasi! Berikut yang paling kritis:
 
 #### 🔴 Prioritas Tinggi (User-Facing, Langsung Terasa)
 
@@ -291,12 +286,12 @@
 | 1 | ~~Halaman 401 Sesi Berakhir (dedicated page)~~ | ✅ Selesai |
 | 2 | ~~Halaman 403 Akses Ditolak (dedicated page)~~ | ✅ Selesai |
 | 3 | ~~Empty State Onboarding (staf baru tanpa entitas)~~ | ✅ Selesai |
-| 4 | Tab Navigation Horizontal di area kerja | UI Shell |
+| 4 | ~~Tab Navigation Horizontal di area kerja~~ | ✅ Selesai |
 | 5 | ~~Koreksi Mandiri (form revisi jam absen)~~ | ✅ Selesai |
 | 6 | ~~Rekapitulasi Induk (tabel master presensi)~~ | ✅ Selesai |
 | 7 | ~~Pusat Persetujuan (halaman/tab terpisah)~~ | ✅ Selesai |
 | 8 | ~~Aturan Presensi (setup lokasi & jam kerja)~~ | ✅ Selesai |
-| 9 | Dasbor Pribadi Presensi (gamifikasi) | Presensi |
+| 9 | ~~Dasbor Pribadi Presensi (gamifikasi)~~ | ✅ Selesai |
 | 10 | ~~Export Laporan Excel/CSV~~ | ✅ Selesai |
 | 11 | ~~Mode Fokus Durasi (30m/1j/2j)~~ | ✅ Selesai |
 | 12 | ~~In-Line Action di Notifikasi (approve dari drawer)~~ | ✅ Selesai |
@@ -315,8 +310,8 @@
 | 20 | Global Kill Switch | Admin |
 | 21 | Safe Invite System (undang staf existing) | Admin |
 | 22 | Quiet Hours (tahan notif malam) | Notifikasi |
-| 23 | Offline Mode Sync | Presensi |
-| 24 | PWA / Service Worker | UI Shell |
+| 23 | ~~Offline Mode Sync~~ | ✅ Selesai |
+| 24 | ~~PWA / Service Worker~~ | ✅ Selesai |
 
 #### 🟢 Prioritas Rendah (Nice to Have)
 
