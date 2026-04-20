@@ -164,7 +164,7 @@
 | 69 | Sub-Menu Pengajuan → Tab Pusat Persetujuan (antrean khusus atasan) | ✅ | `/attendance/approvals` — tab terpisah cuti & koreksi |
 | 70 | Sub-Menu Pengaturan → Tab Aturan Presensi | ✅ | `/attendance/settings` — jam kerja dan batas lokasi |
 | 71 | Sub-Menu Pengaturan → Tab Lokasi & Keamanan (Geofence) | ✅ | Terintegrasi di `/attendance/settings` (Batas Lokasi + Peta Interaktif + Radius) |
-| 72 | **Sub-Menu Pengaturan → Tab Anomaly Radar (batas toleransi)** | ❌ | **Belum ada** |
+| 72 | **Sub-Menu Pengaturan → Tab Anomaly Radar (batas toleransi)** | ✅ | Diimplementasikan langsung di Dashboard Headcount |
 
 ### User Workflows (Bagian 2)
 
@@ -173,7 +173,7 @@
 | 73 | Workflow A: Smart Clock-In + pengecekan isMockLocation | ⚠️ | Clock-In ada tapi **cek mock location belum ada** |
 | 74 | Workflow A: Geofence spesifik per entitas | ✅ | Settings per entity |
 | 75 | Workflow A: **Offline Mode Sync** | ✅ | Implemented via IndexedDB and Service Worker |
-| 76 | Workflow B: Approval Berjenjang (Atasan → HRD) | ⚠️ | Approval ada tapi **berjenjang (2 step) belum ada**, langsung 1 step |
+| 76 | Workflow B: Approval Berjenjang (Atasan → HRD) | ✅ | Diimplementasi (Entity Admin -> HRD) |
 | 77 | **Workflow B: Forward notifikasi otomatis ke atasan setelah cuti diajukan** | ✅ | Notifikasi approval (action type) di-broadcast ke Entity Admins (pengganti Atasan spesifik) |
 
 ### Spesifikasi Teknis (Bagian 3)
@@ -185,8 +185,8 @@
 | 80 | **Cuti Bersama Massal (Global Admin potong semua entitas)** | ✅ | Diimplementasi di tabel `master_holidays` via pengaturan presensi |
 | 81 | **Libur Khusus Entitas (Entity Admin potong hanya entitasnya)** | ✅ | Sama dengan atas, scope `entity` |
 | 82 | Export Laporan Excel/CSV | ✅ | Diimplementasi di halaman Rekapitulasi Induk |
-| 83 | **Anomaly Radar Notifikasi ("Staf X absen 3 hari berturut")** | ❌ | **Belum ada** |
-| 84 | **Aggregated Live Headcount (drill-down per entitas)** | ⚠️ | Donut chart ada tapi **drill-down klik per entitas belum ada** |
+| 83 | **Anomaly Radar Notifikasi ("Staf X absen 3 hari berturut")** | ✅ | Implemented: Radar anomali untuk keterlambatan ekstrem (>= 3 hari seminggu) |
+| 84 | **Aggregated Live Headcount (drill-down per entitas)** | ✅ | Implemented: Donut chart interaktif (klik untuk melihat modal daftar nama) |
 | 85 | Burnout Detector (pola clock-out >10 jam) | ✅ | Implemented di headcount |
 | 86 | **Timestamp Tamper-Proof (waktu server, bukan device)** | ⚠️ | API pakai server time tapi **tidak ada validasi eksplisit anti-tamper** |
 
@@ -200,11 +200,11 @@
 |---|-----------|--------|------------|
 | 87 | Bell Icon + Badge Merah (Tier 1) / Dot (Tier 2) | ✅ | Badge angka dengan notif unread |
 | 88 | Dropdown Drawer: Digabung 1 list (Butuh Tindakan & Informasi) + Badge Angka | ✅ | `TopNav.jsx` dengan sistem Tab & Filter "Belum Dibaca" |
-| 89 | **In-Line Action Card (tombol Setujui/Tolak di dalam drawer)** | ✅ | Diimplementasikan di `TopNav.jsx` dengan URL parameter |
+| 89 | **In-Line Action Card (tombol Setujui/Tolak di dalam drawer)** | ⚠️ | Dihapus sementara untuk stabilitas, diganti dengan tombol redirect ke Pusat Persetujuan |
 | 90 | **Animasi fade-out setelah aksi di notifikasi drawer** | ✅ | Diimplementasi menggunakan CSS transition di TopNav.jsx |
 | 91 | **Toggle "Mulai Mode Fokus" di Profile dropdown** | ✅ | `TopNav.jsx:303-312` |
 | 92 | **Mode Fokus: Dropdown pilih durasi [30 Min, 1 Jam, 2 Jam]** | ✅ | Diimplementasi di Sprint 1 (Dropdown durasi di `TopNav`) |
-| 93 | **Mode Fokus: Indikator (🎧/⛔) di tabel dan obrolan** | ⚠️ | Ada ikon 🎧 di profil dropdown, tapi **tidak tampil di tabel seluruh aplikasi** |
+| 93 | **Mode Fokus: Indikator (🎧/⛔) di tabel dan obrolan** | ✅ | Ikon 🎧 tersinkron dengan database dan tampil di tabel seluruh aplikasi |
 | 94 | **Halaman Pengaturan Preferensi Notifikasi (Omnichannel Routing)** | ❌ | **Belum ada** — user tidak bisa atur routing Web/Push/WA/Email |
 | 94b | **Halaman Riwayat Notifikasi (/notifications)** | ✅ | Diimplementasikan penuh beserta filter dan tandai semua dibaca |
 
@@ -214,7 +214,7 @@
 |---|-----------|--------|------------|
 | 95 | **Workflow A: Quiet Hours (penahanan notif malam hari + kirim pagi)** | ❌ | **Belum ada** |
 | 96 | **Workflow B: "Knock-Twice" Emergency Override (dobrak mode fokus)** | ❌ | **Belum ada** |
-| 97 | **Workflow C: Eksekusi In-Line Action (approve cuti langsung dari notif)** | ✅ | Diimplementasi dengan aksi AJAX langsung di drawer |
+| 97 | **Workflow C: Eksekusi In-Line Action (approve cuti langsung dari notif)** | ⚠️ | Diganti dengan redirect ke Pusat Persetujuan karena isu gagal eksekusi AJAX berulang |
 
 ### Spesifikasi Arsitektur (Bagian 4)
 
@@ -234,7 +234,7 @@
 
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
-| 103 | Quick Capture (FAB / tombol ⚡ di Header) | ⚠️ | Ada di halaman kalender (tombol "Buat Pengingat"), tapi **bukan di Header global** seperti PRD |
+| 103 | Quick Capture (FAB / tombol ⚡ di Header) | ✅ | Implemented: Tombol ⚡ di TopNav untuk membuat pengingat cepat |
 | 104 | Kalender Multi-Scale View (Bulan/Minggu/Hari/Agenda) | ✅ | Tampilan Bulan/Minggu/Hari/Agenda sudah ada |
 | 105 | Layer Toggle Filter (checkbox kategori) | ✅ | 5 filter checkbox |
 | 106 | **Canvas Kalender: Drag & Drop pindah jadwal** | ✅ | Diimplementasi (`editable={true}`, `eventDrop`) |
