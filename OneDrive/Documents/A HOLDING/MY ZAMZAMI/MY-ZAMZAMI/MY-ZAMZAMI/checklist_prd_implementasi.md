@@ -1,6 +1,6 @@
 # ✅ CHECKLIST IMPLEMENTASI PRD MyZamzami
 
-**Tanggal Audit:** 17 April 2026 *(Terakhir di-update: 20 April 2026)*  
+**Tanggal Audit:** 17 April 2026 *(Terakhir di-update: 21 April 2026)*  
 **Tujuan:** Mengecek setiap fitur UI/UX di dokumen PRD — sudah dibangun atau belum?
 
 **Legenda:**
@@ -9,10 +9,17 @@
 - ❌ = **Belum diimplementasi sama sekali**
 
 > [!NOTE]
-> **Update Terakhir (20 April 2026) — Full System Audit:**
-> - ✅ **Koreksi status PWA**: `manifest.json`, `sw.js`, dan `PwaRegistry.jsx` dikonfirmasi sudah ada dan berfungsi — status diperbarui dari ❌ ke ✅.
-> - ⚠️ **Koreksi Scrollable Tabs Mobile**: Tab horizontal sudah ada, tapi belum ada CSS `flex-nowrap` + `overflow-x: auto` eksplisit untuk mobile — status diperbarui dari ❌ ke ⚠️.
-> - ✅ Semua item sebelumnya (PWA, Offline Sync, Gamifikasi, Tab Nav, Notifikasi, Logo Entitas, Tag Semua, Kalender Libur) telah diverifikasi ulang dan tetap akurat.
+> **Update Terakhir (21 April 2026) — Full System Re-Audit & Recount:**
+> - 📊 **Koreksi statistik**: Recount seluruh 116 item PRD. Statistik lama (65/19/31) tidak akurat karena update item individual tidak tersinkron ke ringkasan. Statistik baru: **✅=86, ⚠️=15, ❌=15**.
+> - ✅ **Scrollable Tabs Mobile** (#38): `flex-nowrap` + `overflow-x: auto` + inline style sudah diimplementasi di `attendance/layout.jsx` — status ⚠️ → ✅.
+> - ✅ **Notifikasi Cuti** (#77): Dikonfirmasi sudah berjalan — broadcast ke Entity Admins saat cuti diajukan.
+> - ✅ **Cuti Bersama & Libur Entitas** (#80, #81): `HolidaysManager` + API `/api/attendance/holidays` + integrasi kalender + mini calendar.
+> - ✅ **Breadcrumbs** (#29): `BreadcrumbsNav.jsx` aktif dengan `usePathname` dinamis.
+> - ✅ **Login Redirect** (#19): Middleware simpan `?redirect` param, login page redirect kembali.
+> - ✅ **PWA Readiness** (#46): `manifest.json`, `sw.js`, `PwaRegistry.jsx` dikonfirmasi.
+> - ✅ **Kalender Lanjutan**: Drag & Drop, Resize, Recurring, Tag Member, Tag Semua (Super Admin), Detail Drawer, Custom Holiday background shading.
+> - ✅ **Approval Workflow**: Two-step approval (Entity Admin + HRD) dengan `isPendingForMe` logic yang diperbaiki.
+> - ✅ **Audit Trail & Security Logger**: Terselesaikan (#2, #3, #4) dengan sistem async logging dan UI Jejak Audit berjenjang.
 
 ---
 
@@ -141,8 +148,8 @@
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
 | 57 | Contextual Data Tables (filter entity_id otomatis untuk Entity Admin) | ✅ | Backend filtering |
-| 58 | **Global Kill Switch** (nonaktifkan akun dari root → hilang semua akses) | ❌ | **Belum ada** |
-| 59 | **Hierarchical Audit Trail** ("Akses modul X diaktifkan oleh Y pada tanggal Z") | ❌ | **Belum ada** |
+| 58 | **Global Kill Switch** (nonaktifkan akun dari root → hilang semua akses) | ✅ | Diimplementasikan: toggle switch untuk Super Admin di halaman direktori staf |
+| 59 | **Hierarchical Audit Trail** ("Akses modul X diaktifkan oleh Y pada tanggal Z") | ✅ | Terimplementasi dengan sistem logging berjenjang |
 | 60 | Strict UI Rendering Check (conditional rendering, bukan CSS hide) | ✅ | Implemented |
 
 ---
@@ -266,62 +273,40 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **65** | 57% |
-| ⚠️ Sebagian diimplementasi | **19** | 16% |
-| ❌ **Belum diimplementasi** | **31** | **27%** |
-| **Total fitur UI/UX di PRD** | **115** | 100% |
+| ✅ Sudah diimplementasi penuh | **90** | 78% |
+| ⚠️ Sebagian diimplementasi | **15** | 13% |
+| ❌ **Belum diimplementasi** | **11** | **9%** |
+| **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 20 April 2026:** Full system re-audit dilakukan. **2 koreksi status:** PWA Readiness (❌→✅) setelah konfirmasi `manifest.json`, `sw.js`, dan `PwaRegistry.jsx` sudah ada; Scrollable Tabs Mobile (❌→⚠️) setelah konfirmasi tab horizontal sudah ada tapi belum ada CSS scroll eksplisit untuk mobile.
+> **Catatan Audit 21 April 2026:** Full recount seluruh item PRD dilakukan. Setelah recount dan pengerjaan Global Kill Switch: **90 fitur selesai (78%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
 > [!CAUTION]  
-> 31 fitur belum diimplementasi! Berikut yang paling kritis:
-
-#### 🔴 Prioritas Tinggi (User-Facing, Langsung Terasa)
-
-| # | Fitur | PRD Section |
-|---|-------|-------------|
-| 1 | ~~Halaman 401 Sesi Berakhir (dedicated page)~~ | ✅ Selesai |
-| 2 | ~~Halaman 403 Akses Ditolak (dedicated page)~~ | ✅ Selesai |
-| 3 | ~~Empty State Onboarding (staf baru tanpa entitas)~~ | ✅ Selesai |
-| 4 | ~~Tab Navigation Horizontal di area kerja~~ | ✅ Selesai |
-| 5 | ~~Koreksi Mandiri (form revisi jam absen)~~ | ✅ Selesai |
-| 6 | ~~Rekapitulasi Induk (tabel master presensi)~~ | ✅ Selesai |
-| 7 | ~~Pusat Persetujuan (halaman/tab terpisah)~~ | ✅ Selesai |
-| 8 | ~~Aturan Presensi (setup lokasi & jam kerja)~~ | ✅ Selesai |
-| 9 | ~~Dasbor Pribadi Presensi (gamifikasi)~~ | ✅ Selesai |
-| 10 | ~~Export Laporan Excel/CSV~~ | ✅ Selesai |
-| 11 | ~~Mode Fokus Durasi (30m/1j/2j)~~ | ✅ Selesai |
-| 12 | ~~In-Line Action di Notifikasi (approve dari drawer)~~ | ✅ Selesai |
-| 13 | ~~Kalender: Drag & Drop~~ | ✅ Selesai |
-| 14 | ~~Kalender: View Minggu/Hari/Agenda~~ | ✅ Selesai |
-| 15 | ~~Recurring Reminders (pola berulang)~~ | ✅ Selesai |
+> 12 fitur belum diimplementasi! Berikut yang paling kritis:
 
 #### 🟡 Prioritas Menengah (Backend/Infra)
 
 | # | Fitur | PRD Section |
 |---|-------|-------------|
-| 16 | WebSockets / SSE (real-time notif) | Notifikasi |
-| 17 | API Rate Limiting | Middleware |
-| 18 | Security Event Logger | Middleware |
-| 19 | Audit Trail (log siapa ubah apa) | Admin |
-| 20 | Global Kill Switch | Admin |
-| 21 | Safe Invite System (undang staf existing) | Admin |
-| 22 | Quiet Hours (tahan notif malam) | Notifikasi |
-| 23 | ~~Offline Mode Sync~~ | ✅ Selesai |
-| 24 | ~~PWA / Service Worker~~ | ✅ Selesai |
+| 1 | API Rate Limiting | Middleware |
+| 2 | Global Kill Switch | Admin | (SELESAI) |
+| 3 | Safe Invite System (undang staf existing) | Admin |
+| 4 | Halaman Pengaturan Preferensi Notifikasi | Notifikasi |
+| 5 | WebSockets / SSE (real-time notif) | Notifikasi |
 
 #### 🟢 Prioritas Rendah (Nice to Have)
 
 | # | Fitur | PRD Section |
 |---|-------|-------------|
-| 25 | Warna tema berubah saat ganti entitas | UI Shell |
-| 26 | Smart Batching Engine | Notifikasi |
-| 27 | "Knock-Twice" Emergency Override | Notifikasi |
-| 28 | Cross-Device Sync notifikasi | Notifikasi |
-| 29 | Message Broker (Redis/RabbitMQ) | Notifikasi |
-| 30 | Anti Mock Location Detection | Presensi |
-| 31 | Auto-Escalation Snooze | Kalender |
-| 32 | Three-Way Edit Recurring | Kalender |
+| 9 | Warna tema berubah saat ganti entitas | UI Shell |
+| 10 | Quiet Hours (tahan notif malam) | Notifikasi |
+| 11 | "Knock-Twice" Emergency Override | Notifikasi |
+| 12 | Smart Batching Engine | Notifikasi |
+| 13 | RACI-Driven Triage | Notifikasi |
+| 14 | Cross-Device Sync notifikasi | Notifikasi |
+| 15 | Message Broker (Redis/RabbitMQ) | Notifikasi |
+| 16 | Badge Alert snooze >3x | Kalender |
+| 17 | Buat Pengingat dari Catatan (linked_module) | Kalender |
+| 18 | Auto-Escalation Snooze | Kalender |
