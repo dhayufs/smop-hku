@@ -279,22 +279,21 @@
 | **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 21 April 2026:** Full recount seluruh item PRD dilakukan. Setelah recount dan pengerjaan Global Kill Switch: **90 fitur selesai (78%)**.
+> **Catatan Audit 21 April 2026:** Full recount seluruh item PRD dilakukan. Setelah pengerjaan ulang Global Kill Switch: **90 fitur selesai (78%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
 > [!CAUTION]  
-> 12 fitur belum diimplementasi! Berikut yang paling kritis:
+> 11 fitur belum diimplementasi! Berikut yang paling kritis:
 
 #### 🟡 Prioritas Menengah (Backend/Infra)
 
 | # | Fitur | PRD Section |
 |---|-------|-------------|
 | 1 | API Rate Limiting | Middleware |
-| 2 | Global Kill Switch | Admin | (SELESAI) |
-| 3 | Safe Invite System (undang staf existing) | Admin |
-| 4 | Halaman Pengaturan Preferensi Notifikasi | Notifikasi |
-| 5 | WebSockets / SSE (real-time notif) | Notifikasi |
+| 2 | Safe Invite System (undang staf existing) | Admin |
+| 3 | Halaman Pengaturan Preferensi Notifikasi | Notifikasi |
+| 4 | WebSockets / SSE (real-time notif) | Notifikasi |
 
 #### 🟢 Prioritas Rendah (Nice to Have)
 
