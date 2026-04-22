@@ -254,7 +254,7 @@
 | 105 | Layer Toggle Filter (checkbox kategori) | ✅ | 5 filter checkbox |
 | 106 | **Canvas Kalender: Drag & Drop pindah jadwal** | ✅ | Diimplementasi (`editable={true}`, `eventDrop`) |
 | 107 | **Canvas Kalender: Resize batas kotak untuk ubah durasi** | ✅ | Diimplementasi (`eventResize`) |
-| 108 | **Action Tracker (Dasbor Kedisiplinan) — list "Hari Ini, Esok, Mendatang"** | ⚠️ | Ada "Agenda Hari Ini" dan "Pengingat Mendatang" tapi **bukan format tracker disiplin** |
+| 108 | **Action Tracker (Dasbor Kedisiplinan) — list "Hari Ini, Esok, Mendatang"** | ✅ | Diimplementasikan di *sidebar* kalender dengan blok agenda terpisah dan fitur *checkbox* penyelesaian tugas |
 | 109 | **Badge Alert jika tugas di-snooze >3 kali** | ✅ | Diimplementasi pada eventContent (FullCalendar) dan warning Drawer |
 
 ### User Workflows (Bagian 3)
@@ -281,13 +281,13 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **111** | 96% |
-| ⚠️ Sebagian diimplementasi | **4** | 3% |
+| ✅ Sudah diimplementasi penuh | **112** | 97% |
+| ⚠️ Sebagian diimplementasi | **3** | 2% |
 | ❌ **Belum diimplementasi** | **1** | **1%** |
 | **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 22 April 2026 (Sesi 5):** Fitur *Timestamp Tamper-Proof* (PRD #86) selesai dieksekusi dengan indikator visual *Server-Verified*. Status `⚠️` berubah menjadi `✅`. Skor naik menjadi **111 fitur selesai (96%)**.
+> **Catatan Audit 22 April 2026 (Sesi 5):** Fitur *Action Tracker* (PRD #108) selesai dieksekusi dengan menambahkan kategori *Agenda Besok* pada *sidebar* Kalender. Status `⚠️` berubah menjadi `✅`. Skor naik menjadi **112 fitur selesai (97%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
