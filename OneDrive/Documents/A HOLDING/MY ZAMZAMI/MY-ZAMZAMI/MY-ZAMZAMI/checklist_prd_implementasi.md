@@ -228,7 +228,7 @@
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
 | 95 | **Workflow A: Quiet Hours (penahanan notif malam hari + kirim pagi)** | ✅ | Diimplementasikan di `/api/notifications` dan Settings UI |
-| 96 | **Workflow B: "Knock-Twice" Emergency Override (dobrak mode fokus)** | ❌ | **Belum ada** |
+| 96 | **Workflow B: "Knock-Twice" Emergency Override (dobrak mode fokus)** | ✅ | Diimplementasikan di `src/lib/notifications.js` (deteksi interval 5 menit) |
 | 97 | **Workflow C: Eksekusi In-Line Action (approve cuti langsung dari notif)** | ⚠️ | Diganti dengan redirect ke Pusat Persetujuan karena isu gagal eksekusi AJAX berulang |
 
 ### Spesifikasi Arsitektur (Bagian 4)
@@ -281,13 +281,13 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **102** | 88% |
+| ✅ Sudah diimplementasi penuh | **103** | 89% |
 | ⚠️ Sebagian diimplementasi | **10** | 9% |
-| ❌ **Belum diimplementasi** | **4** | **3%** |
+| ❌ **Belum diimplementasi** | **3** | **2%** |
 | **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 22 April 2026 (Sesi 4):** Implementasi Snooze Escalation (#109 & #112) dan integrasi Quiet Hours via db migration & API updates selesai. Skor naik menjadi **102 fitur selesai (88%)**.
+> **Catatan Audit 22 April 2026 (Sesi 5):** Implementasi Knock-Twice Emergency Override (#96) selesai. Skor naik menjadi **103 fitur selesai (89%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
@@ -298,9 +298,8 @@
 
 | # | Fitur | PRD Section |
 |---|-------|-------------|
-| 1 | "Knock-Twice" Emergency Override | Notifikasi |
-| 2 | Smart Batching Engine | Notifikasi |
-| 3 | RACI-Driven Triage | Notifikasi |
-| 4 | Cross-Device Sync notifikasi | Notifikasi |
-| 5 | Message Broker (Redis/RabbitMQ) | Notifikasi |
-| 6 | Buat Pengingat dari Catatan (linked_module) | Kalender |
+| 1 | Smart Batching Engine | Notifikasi |
+| 2 | RACI-Driven Triage | Notifikasi |
+| 3 | Cross-Device Sync notifikasi | Notifikasi |
+| 4 | Message Broker (Redis/RabbitMQ) | Notifikasi |
+| 5 | Buat Pengingat dari Catatan (linked_module) | Kalender |
