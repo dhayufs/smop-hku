@@ -215,7 +215,7 @@
 |---|-----------|--------|------------|
 | 87 | Bell Icon + Badge Merah (Tier 1) / Dot (Tier 2) | ✅ | Badge angka dengan notif unread |
 | 88 | Dropdown Drawer: Digabung 1 list (Butuh Tindakan & Informasi) + Badge Angka | ✅ | `TopNav.jsx` dengan sistem Tab & Filter "Belum Dibaca" |
-| 89 | **In-Line Action Card (tombol Setujui/Tolak di dalam drawer)** | ⚠️ | Dihapus sementara untuk stabilitas, diganti dengan tombol redirect ke Pusat Persetujuan |
+| 89 | **In-Line Action Card (tombol Setujui/Tolak di dalam drawer)** | ✅ | Diimplementasi ulang (Restore) dengan koneksi langsung ke `/api/attendance/approvals` + SSE Sync |
 | 90 | **Animasi fade-out setelah aksi di notifikasi drawer** | ✅ | Diimplementasi menggunakan CSS transition di TopNav.jsx |
 | 91 | **Toggle "Mulai Mode Fokus" di Profile dropdown** | ✅ | `TopNav.jsx:303-312` |
 | 92 | **Mode Fokus: Dropdown pilih durasi [30 Min, 1 Jam, 2 Jam]** | ✅ | Diimplementasi di Sprint 1 (Dropdown durasi di `TopNav`) |
@@ -229,7 +229,7 @@
 |---|-----------|--------|------------|
 | 95 | **Workflow A: Quiet Hours (penahanan notif malam hari + kirim pagi)** | ✅ | Diimplementasikan di `/api/notifications` dan Settings UI |
 | 96 | **Workflow B: "Knock-Twice" Emergency Override (dobrak mode fokus)** | ✅ | Diimplementasikan di `src/lib/notifications.js` (deteksi interval 5 menit) |
-| 97 | **Workflow C: Eksekusi In-Line Action (approve cuti langsung dari notif)** | ⚠️ | Diganti dengan redirect ke Pusat Persetujuan karena isu gagal eksekusi AJAX berulang |
+| 97 | **Workflow C: Eksekusi In-Line Action (approve cuti langsung dari notif)** | ✅ | Diimplementasi ulang dengan `handleInlineAction` yang mulus dan tanpa reload |
 
 ### Spesifikasi Arsitektur (Bagian 4)
 
@@ -281,13 +281,13 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **105** | 91% |
-| ⚠️ Sebagian diimplementasi | **10** | 9% |
-| ❌ **Belum diimplementasi** | **1** | **0%** |
+| ✅ Sudah diimplementasi penuh | **107** | 92% |
+| ⚠️ Sebagian diimplementasi | **8** | 7% |
+| ❌ **Belum diimplementasi** | **1** | **1%** |
 | **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 22 April 2026 (Sesi 5):** Implementasi Cross-Device State Sync (#101) selesai. Modul Message Broker (#102) dibatalkan karena overkill untuk arsitektur standalone saat ini. Skor naik menjadi **105 fitur selesai (91%)**.
+> **Catatan Audit 22 April 2026 (Sesi 5):** Restorasi In-Line Action Card (PRD #89 & #97) sukses dengan SSE Cross-Device Sync. Status `⚠️` berubah menjadi `✅`. Skor naik menjadi **107 fitur selesai (92%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
