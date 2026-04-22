@@ -140,7 +140,7 @@
 | 49 | Sub-Menu: Master Organisasi → Tab Registri Modul (Global Switch) | ✅ | `/admin/modules` |
 | 50 | Sub-Menu: Manajemen Karyawan → Tab Direktori Staf (filtered by admin scope) | ✅ | `/admin/staff` |
 | 51 | Sub-Menu: Manajemen Karyawan → **Tab Pendaftaran Karyawan (Onboarding)** | ✅ | Diimplementasikan sebagai `Tab` mandiri yang sejajar dengan Direktori Staf |
-| 52 | Sub-Menu: Kontrol Akses → **Tab Alokasi RACI Dasar** | ⚠️ | Ada sebagai tabel terpisah di bawah, **bukan tab** |
+| 52 | Sub-Menu: Kontrol Akses → **Tab Alokasi RACI Dasar** | ✅ | Diimplementasikan sebagai `Tab` mandiri yang sejajar dengan Matrix Hak Akses |
 | 53 | Sub-Menu: Kontrol Akses → Tab Module Toggling | ✅ | Permission matrix |
 
 ### User Workflows (Bagian 3)
@@ -281,13 +281,13 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **108** | 93% |
-| ⚠️ Sebagian diimplementasi | **7** | 6% |
+| ✅ Sudah diimplementasi penuh | **109** | 94% |
+| ⚠️ Sebagian diimplementasi | **6** | 5% |
 | ❌ **Belum diimplementasi** | **1** | **1%** |
 | **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 22 April 2026 (Sesi 5):** Pemisahan *Tab Pendaftaran Karyawan* (PRD #51) selesai dikerjakan, menghapus modal lama. Status `⚠️` berubah menjadi `✅`. Skor naik menjadi **108 fitur selesai (93%)**.
+> **Catatan Audit 22 April 2026 (Sesi 5):** Pemisahan *Tab Alokasi RACI Dasar* (PRD #52) selesai dikerjakan. Status `⚠️` berubah menjadi `✅`. Skor naik menjadi **109 fitur selesai (94%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
