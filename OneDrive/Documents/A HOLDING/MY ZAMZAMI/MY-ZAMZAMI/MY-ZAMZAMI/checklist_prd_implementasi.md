@@ -227,7 +227,7 @@
 
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
-| 95 | **Workflow A: Quiet Hours (penahanan notif malam hari + kirim pagi)** | ❌ | **Belum ada** |
+| 95 | **Workflow A: Quiet Hours (penahanan notif malam hari + kirim pagi)** | ✅ | Diimplementasikan di `/api/notifications` dan Settings UI |
 | 96 | **Workflow B: "Knock-Twice" Emergency Override (dobrak mode fokus)** | ❌ | **Belum ada** |
 | 97 | **Workflow C: Eksekusi In-Line Action (approve cuti langsung dari notif)** | ⚠️ | Diganti dengan redirect ke Pusat Persetujuan karena isu gagal eksekusi AJAX berulang |
 
@@ -255,7 +255,7 @@
 | 106 | **Canvas Kalender: Drag & Drop pindah jadwal** | ✅ | Diimplementasi (`editable={true}`, `eventDrop`) |
 | 107 | **Canvas Kalender: Resize batas kotak untuk ubah durasi** | ✅ | Diimplementasi (`eventResize`) |
 | 108 | **Action Tracker (Dasbor Kedisiplinan) — list "Hari Ini, Esok, Mendatang"** | ⚠️ | Ada "Agenda Hari Ini" dan "Pengingat Mendatang" tapi **bukan format tracker disiplin** |
-| 109 | **Badge Alert jika tugas di-snooze >3 kali** | ❌ | **Belum ada** |
+| 109 | **Badge Alert jika tugas di-snooze >3 kali** | ✅ | Diimplementasi pada eventContent (FullCalendar) dan warning Drawer |
 
 ### User Workflows (Bagian 3)
 
@@ -263,7 +263,7 @@
 |---|-----------|--------|------------|
 | 110 | **Workflow A: "Buat Pengingat dari Catatan"** (linked_module + linked_item) | ❌ | **Belum ada** — tidak ada integrasi context-priming dari modul lain |
 | 111 | **Workflow B: Pola Berulang (recurring patterns + holiday behavior)** | ✅ | Diimplementasi (form `recurrence_rule` & backend handler) |
-| 112 | **Workflow C: Auto-Escalation Snooze >3x → notif ke atasan** | ❌ | **Belum ada** |
+| 112 | **Workflow C: Auto-Escalation Snooze >3x → notif ke atasan** | ✅ | Diimplementasi pada `/api/calendar/events` logic snooze |
 
 ### Spesifikasi Teknis (Bagian 4)
 
@@ -281,13 +281,13 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **100** | 86% |
+| ✅ Sudah diimplementasi penuh | **102** | 88% |
 | ⚠️ Sebagian diimplementasi | **10** | 9% |
-| ❌ **Belum diimplementasi** | **6** | **5%** |
+| ❌ **Belum diimplementasi** | **4** | **3%** |
 | **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 22 April 2026 (Sesi 3):** Implementasi Three-Way Edit Logic (#115) untuk recurring calendar events selesai. Skor naik menjadi **100 fitur selesai (86%)**.
+> **Catatan Audit 22 April 2026 (Sesi 4):** Implementasi Snooze Escalation (#109 & #112) dan integrasi Quiet Hours via db migration & API updates selesai. Skor naik menjadi **102 fitur selesai (88%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
@@ -298,12 +298,9 @@
 
 | # | Fitur | PRD Section |
 |---|-------|-------------|
-| 1 | Quiet Hours (tahan notif malam) | Notifikasi |
-| 2 | "Knock-Twice" Emergency Override | Notifikasi |
-| 3 | Smart Batching Engine | Notifikasi |
-| 4 | RACI-Driven Triage | Notifikasi |
-| 5 | Cross-Device Sync notifikasi | Notifikasi |
-| 6 | Message Broker (Redis/RabbitMQ) | Notifikasi |
-| 7 | Badge Alert snooze >3x | Kalender |
-| 8 | Buat Pengingat dari Catatan (linked_module) | Kalender |
-| 9 | Auto-Escalation Snooze | Kalender |
+| 1 | "Knock-Twice" Emergency Override | Notifikasi |
+| 2 | Smart Batching Engine | Notifikasi |
+| 3 | RACI-Driven Triage | Notifikasi |
+| 4 | Cross-Device Sync notifikasi | Notifikasi |
+| 5 | Message Broker (Redis/RabbitMQ) | Notifikasi |
+| 6 | Buat Pengingat dari Catatan (linked_module) | Kalender |
