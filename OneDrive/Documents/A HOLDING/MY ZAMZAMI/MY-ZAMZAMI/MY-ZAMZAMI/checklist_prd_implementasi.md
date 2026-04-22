@@ -59,7 +59,7 @@
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
 | 12 | Contextual Entity Switcher (hanya muncul jika >1 entitas) | ✅ | `TopNav.jsx:66` |
-| 13 | Active Session Manager (tabel IP, browser, waktu login) | ⚠️ | Tabel ada, IP & user-agent **parsing real** dari header, tapi hanya menampilkan **sesi aktif saat ini** — belum ada multi-session tracking di database |
+| 13 | Active Session Manager (tabel IP, browser, waktu login) | ✅ | Diimplementasi menggunakan tabel `user_sessions`, pelacakan *User-Agent* saat *login*, dan validasi `is_revoked` *real-time* di *middleware* |
 | 14 | Centralized User Provisioning + auto password via email/WA | ⚠️ | Form ada, password auto-generate ada, tapi **pengiriman via email/WA belum ada** |
 | 15 | Dynamic Permission Matrix (toggle switch grid) | ✅ | `/admin/permissions` |
 | 16 | Global Access Audit Log | ✅ | `logSecurityEvent` dipanggil di `permissions/route.js:142-154` saat perubahan akses. Ditampilkan di UI halaman Jejak Audit (`admin/audit-logs`) |
@@ -281,13 +281,13 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **114** | 98% |
-| ⚠️ Sebagian diimplementasi | **2** | 2% |
+| ✅ Sudah diimplementasi penuh | **115** | 99% |
+| ⚠️ Sebagian diimplementasi | **1** | 1% |
 | ❌ **Belum diimplementasi** | **0** | **0%** |
 | **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 22 April 2026 (Sesi 5):** Fitur terakhir berstatus `❌` yakni *RACI-Driven Triage* (PRD #99) berhasil diimplementasi. Sistem MyZamzami resmi mencapai **0% Belum diimplementasi**. Skor naik menjadi **114 fitur selesai (98%)**.
+> **Catatan Audit 22 April 2026 (Sesi 5):** Fitur parsial *Active Session Manager* (PRD #13) dieksekusi dengan melacak data login multi-perangkat di database secara penuh. Status `⚠️` berubah menjadi `✅`. Skor naik menjadi **115 fitur selesai (99%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
