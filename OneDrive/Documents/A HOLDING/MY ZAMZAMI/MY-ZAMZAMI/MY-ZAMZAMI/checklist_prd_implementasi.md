@@ -170,7 +170,7 @@
 |---|-----------|--------|------------|
 | 61 | **Sub-Menu Dasbor → Tab Dasbor Pribadi (Gamifikasi/Positive Nudges)** | ✅ | `/attendance/dashboard` dengan Punctuality Score & On-Time Streak |
 | 62 | Sub-Menu Dasbor → Tab Live Headcount | ✅ | `/attendance/headcount` |
-| 63 | **Sub-Menu Dasbor → Tab Analitik Kinerja (Overwork/Burnout)** | ⚠️ | Burnout chart ada di headcount, tapi **bukan tab terpisah** |
+| 63 | **Sub-Menu Dasbor → Tab Analitik Kinerja (Overwork/Burnout)** | ✅ | Diimplementasikan sebagai `Tab` mandiri yang sejajar dengan Radar Kehadiran |
 | 64 | Sub-Menu Pencatatan → Tab Absen | ✅ | `/attendance/clock` |
 | 65 | Sub-Menu Pencatatan → Tab Riwayat Pribadi | ✅ | `/attendance/history` |
 | 66 | Sub-Menu Pencatatan → Tab Rekapitulasi Induk (Master Table) | ✅ | `/attendance/recap` — tabel rekapitulasi staf |
@@ -281,13 +281,13 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **109** | 94% |
-| ⚠️ Sebagian diimplementasi | **6** | 5% |
+| ✅ Sudah diimplementasi penuh | **110** | 95% |
+| ⚠️ Sebagian diimplementasi | **5** | 4% |
 | ❌ **Belum diimplementasi** | **1** | **1%** |
 | **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 22 April 2026 (Sesi 5):** Pemisahan *Tab Alokasi RACI Dasar* (PRD #52) selesai dikerjakan. Status `⚠️` berubah menjadi `✅`. Skor naik menjadi **109 fitur selesai (94%)**.
+> **Catatan Audit 22 April 2026 (Sesi 5):** Pemisahan *Tab Analitik Kinerja* (PRD #63) selesai dikerjakan. Status `⚠️` berubah menjadi `✅`. Skor naik menjadi **110 fitur selesai (95%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
