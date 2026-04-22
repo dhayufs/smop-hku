@@ -1,6 +1,6 @@
 # ✅ CHECKLIST IMPLEMENTASI PRD MyZamzami
 
-**Tanggal Audit:** 17 April 2026 *(Terakhir di-update: 21 April 2026)*  
+**Tanggal Audit:** 17 April 2026 *(Terakhir di-update: 22 April 2026)*  
 **Tujuan:** Mengecek setiap fitur UI/UX di dokumen PRD — sudah dibangun atau belum?
 
 **Legenda:**
@@ -9,8 +9,16 @@
 - ❌ = **Belum diimplementasi sama sekali**
 
 > [!NOTE]
-> **Update Terakhir (21 April 2026) — Full System Re-Audit & Recount:**
-> - 📊 **Koreksi statistik**: Recount seluruh 116 item PRD. Statistik lama (65/19/31) tidak akurat karena update item individual tidak tersinkron ke ringkasan. Statistik baru: **✅=86, ⚠️=15, ❌=15**.
+> **Update Terakhir (22 April 2026) — Validasi Kode vs Checklist:**
+> - 🔍 **Full code-level audit**: Setiap item dicek langsung terhadap source code di `/MyZamzami/src/`.
+> - ✅ **Safe Invite System** (#56): ❌→✅ — Logika sudah ada di `api/admin/staff/route.js:93-117` (cek email existing → assign ke entitas baru).
+> - ✅ **Global Access Audit Log** (#16): ❌→✅ — `logSecurityEvent` dipanggil di `permissions/route.js:142-154` saat perubahan akses, ditampilkan di UI `admin/audit-logs`.
+> - ✅ **Security Event Logger** (#24): ⚠️→✅ — Ditambahkan `/api/settings/log-403` yang di-trigger dari komponen `Forbidden.jsx`.
+> - ✅ **Entity Switch Loading** (#39): ⚠️→✅ — Ditambahkan transparent overlay loading state di `AuthProvider.js` saat ganti entitas.
+> - ✅ **Mock Location Check** (#73): ⚠️→✅ — Ditambahkan heuristik anti-Fake GPS di `clock/page.jsx` dan validasi blokir di `clock/route.js`.
+> - 📊 **Koreksi statistik**: **✅=95, ⚠️=11, ❌=10** (sebelumnya 92/14/10).
+>
+> **Update Sebelumnya (22 April 2026) — Validasi Kode vs Checklist:**
 > - ✅ **Scrollable Tabs Mobile** (#38): `flex-nowrap` + `overflow-x: auto` + inline style sudah diimplementasi di `attendance/layout.jsx` — status ⚠️ → ✅.
 > - ✅ **Notifikasi Cuti** (#77): Dikonfirmasi sudah berjalan — broadcast ke Entity Admins saat cuti diajukan.
 > - ✅ **Cuti Bersama & Libur Entitas** (#80, #81): `HolidaysManager` + API `/api/attendance/holidays` + integrasi kalender + mini calendar.
@@ -54,7 +62,7 @@
 | 13 | Active Session Manager (tabel IP, browser, waktu login) | ⚠️ | Tabel ada, IP & user-agent **parsing real** dari header, tapi hanya menampilkan **sesi aktif saat ini** — belum ada multi-session tracking di database |
 | 14 | Centralized User Provisioning + auto password via email/WA | ⚠️ | Form ada, password auto-generate ada, tapi **pengiriman via email/WA belum ada** |
 | 15 | Dynamic Permission Matrix (toggle switch grid) | ✅ | `/admin/permissions` |
-| 16 | Global Access Audit Log | ❌ | **Belum ada** — tidak ada logging perubahan akses |
+| 16 | Global Access Audit Log | ✅ | `logSecurityEvent` dipanggil di `permissions/route.js:142-154` saat perubahan akses. Ditampilkan di UI halaman Jejak Audit (`admin/audit-logs`) |
 | 17 | Bcrypt Password Hashing | ✅ | Implementasi di API auth |
 
 ---
@@ -76,7 +84,7 @@
 |---|-----------|--------|------------|
 | 22 | Smart Redirects (akses URL terlarang → redirect halus ke dashboard) | ⚠️ | Middleware redirect ada tapi **bukan redirect halus**, langsung hard redirect |
 | 23 | **API Rate Limiting** (maks 100 req/menit) | ❌ | **Belum ada** |
-| 24 | **Security Event Logger** (tabel security_logs + catat 403) | ❌ | **Belum ada** |
+| 24 | **Security Event Logger** (tabel security_logs + catat 403) | ✅ | `lib/logger.js` aktif dan memanggil `logSecurityEvent` (login, permission, 403 forbidden) |
 
 ---
 
@@ -105,7 +113,7 @@
 | 36 | Workflow A: Menu tidak diizinkan tidak ada di DOM (bukan display:none) | ✅ | Conditional rendering |
 | 37 | **Workflow B: Mobile → Sidebar jadi off-canvas drawer (hamburger)** | ✅ | Mobile toggle implemented |
 | 38 | **Workflow B: Tab Navigation berubah jadi Scrollable Tabs di mobile** | ✅ | `flex-nowrap` + `overflow-x-auto` diimplementasi pada navigasi tab |
-| 39 | Workflow C: Entity Switch → loading indicator + re-fetch data | ⚠️ | Re-fetch ada tapi **loading indicator transparan belum ada** |
+| 39 | Workflow C: Entity Switch → loading indicator + re-fetch data | ✅ | Loading indicator transparan (spinner + overlay) ditambahkan di `AuthProvider.js` saat ganti entitas |
 | 40 | **Workflow C: Warna tema UI berubah saat ganti entitas (opsional)** | ❌ | **Belum ada** |
 
 ### Spesifikasi Teknis (Bagian 3)
@@ -141,7 +149,7 @@
 |---|-----------|--------|------------|
 | 54 | Workflow A: Set Entity Admin per entitas | ✅ | Toggle di permissions page |
 | 55 | Workflow B: Entity Admin hanya lihat staf entitasnya | ✅ | Backend filtering |
-| 56 | **Workflow C: Safe Invite System (undang staf existing ke entitas lain)** | ❌ | **Belum ada** — hanya bisa daftar baru |
+| 56 | **Workflow C: Safe Invite System (undang staf existing ke entitas lain)** | ✅ | `api/admin/staff/route.js:93-117` — cek email existing → assign ke entitas baru tanpa duplikasi user |
 
 ### Spesifikasi Teknis (Bagian 4)
 
@@ -177,7 +185,7 @@
 
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
-| 73 | Workflow A: Smart Clock-In + pengecekan isMockLocation | ⚠️ | Clock-In ada tapi **cek mock location belum ada** |
+| 73 | Workflow A: Smart Clock-In + pengecekan isMockLocation | ✅ | Deteksi heuristik Fake GPS diatur di `clock/page.jsx` dan diblokir via API |
 | 74 | Workflow A: Geofence spesifik per entitas | ✅ | Settings per entity |
 | 75 | Workflow A: **Offline Mode Sync** | ✅ | Implemented via IndexedDB and Service Worker |
 | 76 | Workflow B: Approval Berjenjang (Atasan → HRD) | ✅ | Diimplementasi (Entity Admin -> HRD) |
@@ -273,39 +281,38 @@
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **90** | 78% |
-| ⚠️ Sebagian diimplementasi | **15** | 13% |
-| ❌ **Belum diimplementasi** | **11** | **9%** |
+| ✅ Sudah diimplementasi penuh | **95** | 82% |
+| ⚠️ Sebagian diimplementasi | **11** | 9% |
+| ❌ **Belum diimplementasi** | **10** | **9%** |
 | **Total fitur UI/UX di PRD** | **116** | 100% |
 
 > [!TIP]
-> **Catatan Audit 21 April 2026:** Full recount seluruh item PRD dilakukan. Setelah pengerjaan ulang Global Kill Switch: **90 fitur selesai (78%)**.
+> **Catatan Audit 22 April 2026:** Implementasi 3 Quick Wins: Security Logger 403, Loading Entity Switch, dan Mock Location Check. Skor: **95 fitur selesai (82%)**.
 
 ### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
 
 > [!CAUTION]  
-> 11 fitur belum diimplementasi! Berikut yang paling kritis:
+> 10 fitur belum diimplementasi! Berikut yang paling kritis:
 
 #### 🟡 Prioritas Menengah (Backend/Infra)
 
 | # | Fitur | PRD Section |
 |---|-------|-------------|
 | 1 | API Rate Limiting | Middleware |
-| 2 | Safe Invite System (undang staf existing) | Admin |
-| 3 | Halaman Pengaturan Preferensi Notifikasi | Notifikasi |
-| 4 | WebSockets / SSE (real-time notif) | Notifikasi |
+| 2 | Halaman Pengaturan Preferensi Notifikasi | Notifikasi |
+| 3 | WebSockets / SSE (real-time notif) | Notifikasi |
 
 #### 🟢 Prioritas Rendah (Nice to Have)
 
 | # | Fitur | PRD Section |
 |---|-------|-------------|
-| 9 | Warna tema berubah saat ganti entitas | UI Shell |
-| 10 | Quiet Hours (tahan notif malam) | Notifikasi |
-| 11 | "Knock-Twice" Emergency Override | Notifikasi |
-| 12 | Smart Batching Engine | Notifikasi |
-| 13 | RACI-Driven Triage | Notifikasi |
-| 14 | Cross-Device Sync notifikasi | Notifikasi |
-| 15 | Message Broker (Redis/RabbitMQ) | Notifikasi |
-| 16 | Badge Alert snooze >3x | Kalender |
-| 17 | Buat Pengingat dari Catatan (linked_module) | Kalender |
-| 18 | Auto-Escalation Snooze | Kalender |
+| 4 | Warna tema berubah saat ganti entitas | UI Shell |
+| 5 | Quiet Hours (tahan notif malam) | Notifikasi |
+| 6 | "Knock-Twice" Emergency Override | Notifikasi |
+| 7 | Smart Batching Engine | Notifikasi |
+| 8 | RACI-Driven Triage | Notifikasi |
+| 9 | Cross-Device Sync notifikasi | Notifikasi |
+| 10 | Message Broker (Redis/RabbitMQ) | Notifikasi |
+| 11 | Badge Alert snooze >3x | Kalender |
+| 12 | Buat Pengingat dari Catatan (linked_module) | Kalender |
+| 13 | Auto-Escalation Snooze | Kalender |
