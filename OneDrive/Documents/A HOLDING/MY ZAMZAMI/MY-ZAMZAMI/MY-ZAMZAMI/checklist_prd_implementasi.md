@@ -1,30 +1,30 @@
 # ✅ CHECKLIST IMPLEMENTASI PRD MyZamzami
 
-**Tanggal Audit:** 17 April 2026 *(Terakhir di-update: 22 April 2026)*  
+**Tanggal Audit:** 17 April 2026 *(Terakhir di-update: 23 April 2026)*  
 **Tujuan:** Mengecek setiap fitur UI/UX di dokumen PRD — sudah dibangun atau belum?
 
 **Legenda:**
 - ✅ = Sudah diimplementasi
 - ⚠️ = Sebagian diimplementasi (belum lengkap)
 - ❌ = **Belum diimplementasi sama sekali**
+- 🚫 = **Dibatalkan (Not Applicable)** — sengaja tidak diimplementasi karena arsitektur tidak membutuhkannya
 
 > [!NOTE]
-> **Update Terakhir (22 April 2026) — Validasi Kode vs Checklist:**
-> - 🔍 **Full code-level audit**: Setiap item dicek langsung terhadap source code di `/MyZamzami/src/`.
+> **Update Terakhir (23 April 2026) — Full System Audit:**
+> - 🔍 **Full code-level audit**: Setiap item dicek ulang langsung terhadap seluruh source code di `/MyZamzami/src/`.
+> - ✅ **API Rate Limiting** (#23): ❌→✅ — Ternyata sudah diimplementasi di `middleware.js:3-27` menggunakan in-memory `Map` rate limiter (100 req/menit API umum, 10 req/menit login).
+> - ✅ **Warna Tema Entity** (#40): ❌→✅ — Sudah diimplementasi di `ThemeInjector.jsx` — CSS variables (`--bs-primary`, `--bs-primary-rgb`, dll.) di-inject dinamis berdasarkan `activeEntity.color`.
+> - 🚫 **Message Broker** (#102): ❌→🚫 — Dikonfirmasi arsitekturnya *single-instance standalone* di aaPanel, in-memory SSE event emitter sudah mencukupi.
+> - 📊 **Koreksi statistik**: **✅=113, ⚠️=2, ❌=1, 🚫=1** → Total 117 item.
+>
+> **Update Sebelumnya (22 April 2026) — Validasi Kode vs Checklist:**
 > - ✅ **Safe Invite System** (#56): ❌→✅ — Logika sudah ada di `api/admin/staff/route.js:93-117` (cek email existing → assign ke entitas baru).
 > - ✅ **Global Access Audit Log** (#16): ❌→✅ — `logSecurityEvent` dipanggil di `permissions/route.js:142-154` saat perubahan akses, ditampilkan di UI `admin/audit-logs`.
 > - ✅ **Security Event Logger** (#24): ⚠️→✅ — Ditambahkan `/api/settings/log-403` yang di-trigger dari komponen `Forbidden.jsx`.
 > - ✅ **Entity Switch Loading** (#39): ⚠️→✅ — Ditambahkan transparent overlay loading state di `AuthProvider.js` saat ganti entitas.
 > - ✅ **Mock Location Check** (#73): ⚠️→✅ — Ditambahkan heuristik anti-Fake GPS di `clock/page.jsx` dan validasi blokir di `clock/route.js`.
-> - 📊 **Koreksi statistik**: **✅=95, ⚠️=11, ❌=10** (sebelumnya 92/14/10).
->
-> **Update Sebelumnya (22 April 2026) — Validasi Kode vs Checklist:**
-> - ✅ **Scrollable Tabs Mobile** (#38): `flex-nowrap` + `overflow-x: auto` + inline style sudah diimplementasi di `attendance/layout.jsx` — status ⚠️ → ✅.
+> - ✅ **Scrollable Tabs Mobile** (#38): `flex-nowrap` + `overflow-x: auto` + inline style sudah diimplementasi di `attendance/layout.jsx`.
 > - ✅ **Notifikasi Cuti** (#77): Dikonfirmasi sudah berjalan — broadcast ke Entity Admins saat cuti diajukan.
-> - ✅ **Cuti Bersama & Libur Entitas** (#80, #81): `HolidaysManager` + API `/api/attendance/holidays` + integrasi kalender + mini calendar.
-> - ✅ **Breadcrumbs** (#29): `BreadcrumbsNav.jsx` aktif dengan `usePathname` dinamis.
-> - ✅ **Login Redirect** (#19): Middleware simpan `?redirect` param, login page redirect kembali.
-> - ✅ **PWA Readiness** (#46): `manifest.json`, `sw.js`, `PwaRegistry.jsx` dikonfirmasi.
 > - ✅ **Kalender Lanjutan**: Drag & Drop, Resize, Recurring, Tag Member, Tag Semua (Super Admin), Detail Drawer, Custom Holiday background shading.
 > - ✅ **Approval Workflow**: Two-step approval (Entity Admin + HRD) dengan `isPendingForMe` logic yang diperbaiki.
 > - ✅ **Audit Trail & Security Logger**: Terselesaikan (#2, #3, #4) dengan sistem async logging dan UI Jejak Audit berjenjang.
@@ -41,7 +41,7 @@
 | 2 | Sub-Menu: Profil Pribadi → Tab Sesi Aktif | ✅ | `/settings/sessions` — daftar perangkat + logout all |
 | 3 | Sub-Menu: Manajemen Organisasi → Tab Master Karyawan | ✅ | `/admin/staff` |
 | 4 | Sub-Menu: Manajemen Organisasi → Tab Master Entitas | ✅ | `/admin/entities` |
-| 5 | Sub-Menu: Matriks Kontrol Akses → Tab Penempatan Entitas | ⚠️ | Ada di permissions page tapi **bukan tab terpisah**, digabung |
+| 5 | Sub-Menu: Matriks Kontrol Akses → Tab Penempatan Entitas | ✅ | Diimplementasi terpisah pada tab "Penempatan Entitas" di halaman `/admin/permissions` |
 | 6 | Sub-Menu: Matriks Kontrol Akses → Tab Module Toggling | ✅ | `/admin/permissions` — toggle switch matrix |
 
 ### User Workflows (Bagian 3)
@@ -83,7 +83,7 @@
 | # | Fitur PRD | Status | Keterangan |
 |---|-----------|--------|------------|
 | 22 | Smart Redirects (akses URL terlarang → redirect halus ke dashboard) | ✅ | Diimplementasikan menggunakan sistem *countdown timer* 3 detik di halaman `Forbidden.jsx` yang secara otomatis melempar *user* kembali ke Dasbor |
-| 23 | **API Rate Limiting** (maks 100 req/menit) | ❌ | **Belum ada** |
+| 23 | **API Rate Limiting** (maks 100 req/menit) | ✅ | Diimplementasi di `middleware.js:3-27` — in-memory `Map` rate limiter, 100 req/menit untuk API umum, 10 req/menit untuk login, respons `429 Too Many Requests` |
 | 24 | **Security Event Logger** (tabel security_logs + catat 403) | ✅ | `lib/logger.js` aktif dan memanggil `logSecurityEvent` (login, permission, 403 forbidden) |
 
 ---
@@ -114,7 +114,7 @@
 | 37 | **Workflow B: Mobile → Sidebar jadi off-canvas drawer (hamburger)** | ✅ | Mobile toggle implemented |
 | 38 | **Workflow B: Tab Navigation berubah jadi Scrollable Tabs di mobile** | ✅ | `flex-nowrap` + `overflow-x-auto` diimplementasi pada navigasi tab |
 | 39 | Workflow C: Entity Switch → loading indicator + re-fetch data | ✅ | Loading indicator transparan (spinner + overlay) ditambahkan di `AuthProvider.js` saat ganti entitas |
-| 40 | **Workflow C: Warna tema UI berubah saat ganti entitas (opsional)** | ❌ | **Belum ada** |
+| 40 | **Workflow C: Warna tema UI berubah saat ganti entitas (opsional)** | ✅ | `ThemeInjector.jsx` meng-inject CSS variables (`--bs-primary`, `.text-primary`, `.btn-primary`, dll.) secara dinamis berdasarkan `activeEntity.color` |
 
 ### Spesifikasi Teknis (Bagian 3)
 
@@ -239,7 +239,7 @@
 | 99 | **RACI-Driven Triage (Tier 1 = active push, Tier 2 = silent)** | ✅ | Diimplementasikan melalui fitur "RACI Downgrade" secara statis (*API fetch*) maupun *Real-Time* (SSE Broadcaster) berdasarkan properti `raci_baseline` |
 | 100 | **WebSockets / SSE (real-time push notification)** | ✅ | **Diimplementasi penuh** menggunakan In-Memory SSE di Node.js |
 | 101 | **Cross-Device State Sync (notif hilang di semua device)** | ✅ | Diimplementasi menggunakan *event* `remove_notification` SSE saat status berubah |
-| 102 | **Message Broker (Redis/RabbitMQ)** | ❌ | **Batal/Overkill:** Aplikasi bersifat Standalone single-instance di aaPanel, menggunakan in-memory event emitter jauh lebih cepat dan efisien |
+| 102 | **Message Broker (Redis/RabbitMQ)** | 🚫 | **Dibatalkan (N/A):** Arsitektur standalone single-instance di aaPanel, in-memory SSE event emitter (`sse.js`) jauh lebih cepat dan efisien. Redis/RabbitMQ overkill untuk skala ini |
 
 ---
 
@@ -277,26 +277,33 @@
 
 ## 📊 RINGKASAN AKHIR
 
-### Statistik
+### Statistik (Terakhir diaudit: 23 April 2026)
 
 | Status | Jumlah | Persentase |
 |--------|--------|------------|
-| ✅ Sudah diimplementasi penuh | **116** | 100% |
-| ⚠️ Sebagian diimplementasi | **0** | 0% |
-| ❌ **Belum diimplementasi** | **0** | **0%** |
-| **Total fitur UI/UX di PRD** | **116** | 100% |
+| ✅ Sudah diimplementasi penuh | **114** | 97.4% |
+| ⚠️ Sebagian diimplementasi | **1** | 0.9% |
+| ❌ **Belum diimplementasi** | **1** | **0.9%** |
+| 🚫 Dibatalkan (N/A) | **1** | 0.9% |
+| **Total fitur UI/UX di PRD** | **117** | — |
 
 > [!TIP]
-> **Catatan Audit Terakhir 22 April 2026 (Sesi 5):** Fitur *Centralized User Provisioning* (PRD #14) telah dieksekusi dengan *email delivery* SMTP `nodemailer`. Status `⚠️` terakhir berubah menjadi `✅`. Skor sempurna **116 fitur selesai (100%)**. MyZamzami mencapai garis finis! 🎉
+> **Catatan Audit 23 April 2026:** Full system audit dilakukan langsung terhadap seluruh source code.
+> - **#23 API Rate Limiting** ditemukan sudah terimplementasi di `middleware.js` (sebelumnya salah ditandai ❌).
+> - **#40 Warna Tema Entity** ditemukan sudah terimplementasi di `ThemeInjector.jsx` (sebelumnya salah ditandai ❌).
+> - **#102 Message Broker** dikonfirmasi **sengaja dibatalkan** (arsitektur tidak membutuhkan).
+> - Skor efektif: **113 dari 116 fitur aktif = 97.4%** (tidak termasuk 1 item N/A).
 
-### Top Priority — Fitur BELUM Ada yang Paling Terasa Dampaknya
+### Sisa Pekerjaan
 
-> [!CAUTION]  
-> 6 fitur belum diimplementasi! Berikut sisa pekerjaannya:
+#### ⚠️ Sebagian Diimplementasi (1 item)
 
-#### 🟢 Prioritas Menengah (Nice to Have)
+| # | Fitur | PRD | Keterangan |
+|---|-------|-----|------------|
+| 1 | Component Lazy Loading (#44) | PRD 3 | Next.js auto code splitting, tapi **tidak ada lazy load per modul berdasarkan izin** |
 
-| # | Fitur | PRD Section |
-|---|-------|-------------|
-| 1 | RACI-Driven Triage | Notifikasi |
-| 2 | Buat Pengingat dari Catatan (linked_module) | Kalender |
+#### ❌ Belum Diimplementasi (1 item)
+
+| # | Fitur | PRD | Keterangan |
+|---|-------|-----|------------|
+| 1 | Buat Pengingat dari Catatan (#110) | PRD 7 | Tidak ada integrasi `linked_module` + `linked_item` — context priming dari modul lain ke kalender |
