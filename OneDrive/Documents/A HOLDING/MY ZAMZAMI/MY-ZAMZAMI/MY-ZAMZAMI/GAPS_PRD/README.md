@@ -23,7 +23,7 @@ Pencarian dilakukan terhadap: middleware, API routes, frontend components, datab
 | **GAP-05** | Tabel `recurring_patterns` & Holiday-Aware Engine | 🟡 SEDANG | PRD 7 |
 | **GAP-06** | Tabel `user_focus_states` & Emergency Override Logging | ✅ SELESAI | PRD 6 |
 | **GAP-07** | Kolom `scheduled_for` & `group_key` di Notifications | 🟡 SEDANG | PRD 6 |
-| **GAP-08** | Omnichannel Notification Routing (Push, WA, Email) | 🟡 SEDANG | PRD 6 |
+| **GAP-08** | Omnichannel Notification Routing (Push, WA, Email) [PENDING] | 🟡 SEDANG | PRD 6 |
 | **GAP-09** | WiFi SSID Validation pada Clock-In | 🟢 RENDAH | PRD 5 |
 | **GAP-10** | Entity Context Payload pada SSE | 🟢 RENDAH | PRD 6 |
 | **GAP-11** | Horizontal Privilege Escalation Prevention | ✅ SELESAI | PRD 4 |
