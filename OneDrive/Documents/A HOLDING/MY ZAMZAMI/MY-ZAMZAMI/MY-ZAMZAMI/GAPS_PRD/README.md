@@ -18,7 +18,7 @@ Pencarian dilakukan terhadap: middleware, API routes, frontend components, datab
 |------|-----|-----------|----------|
 | **GAP-01** | Stateless JWT Middleware (3-Layer Security) | ✅ SELESAI | PRD 2 |
 | **GAP-02** | Two-Factor Authentication (2FA) | ✅ SELESAI | PRD 1 |
-| **GAP-03** | Session-Expired Draft Preservation | 🟡 SEDANG | PRD 2 |
+| **GAP-03** | Session-Expired Draft Preservation | ✅ SELESAI | PRD 2 |
 | **GAP-04** | Permission-Based Lazy Loading | 🟢 RENDAH | PRD 3 |
 | **GAP-05** | Tabel `recurring_patterns` & Holiday-Aware Engine | 🟡 SEDANG | PRD 7 |
 | **GAP-06** | Tabel `user_focus_states` & Emergency Override Logging | ✅ SELESAI | PRD 6 |
